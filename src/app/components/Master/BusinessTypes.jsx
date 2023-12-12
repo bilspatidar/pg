@@ -1,5 +1,5 @@
 import React, { useRef,JWTAuthContext } from 'react'
-import {BASE_URL} from './../../config';
+import {BASE_URL} from '../../config';
 import { Stack } from '@mui/material';
 import { Box, styled } from '@mui/material';
 import { Breadcrumb, SimpleCard } from 'app/components';
@@ -35,7 +35,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import GroupEdit from './GroupEdit';
+// import SubCategoryEdit from './SubCategoryEdit';
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -71,7 +71,7 @@ const Small = styled('small')(({ bgcolor }) => ({
     },
   }));
 
-function Group () {
+function BusinessTypes () {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
@@ -94,29 +94,23 @@ function Group () {
   const [deletedItemId, setDeletedItemId] = React.useState();
 
   const tableRef = useRef(null);
-  
+
+
     const [formData, setFormData] = useState({
-      
-        branch_id: '',
-        user_id: '',
-        name: '',
-        max_limit: '',
-        max_member: '',
-        emi_date: '',
-        location: '',
-        address: '',
-        image: '',
-        status: '',
+    
+      name: '',
+      status: '',
       });
+
+      const [categories, setCategories] = useState([]);
+
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
     
     const [imageData, setImageData] = useState('');
-    const [branchs, setBranchs] = useState([]);
-    const [members, setMembers] = useState([]);
 
-    const fetchBranchs = async () => {
-      const endpoint = `${BASE_URL}/branch/index`;
+    const fetchCategories = async () => {
+      const endpoint = `${BASE_URL}/category/index`;
 
       try {
         const response = await fetch(endpoint, {
@@ -128,25 +122,7 @@ function Group () {
         })
 
         const {data} = await response.json();
-        setBranchs(data);
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    const fetchMembers = async () => {
-      const endpoint = `${BASE_URL}/member/index`;
-
-      try {
-        const response = await fetch(endpoint, {
-          method: "get",
-          headers: new Headers({
-            "ngrok-skip-browser-warning": true,
-            "token": token
-          }),  
-        })
-
-        const {data} = await response.json();
-        setMembers(data);
+        setCategories(data);
       } catch (error) {
         console.log(error)
       }
@@ -156,7 +132,7 @@ function Group () {
       //Get Data from API 
       async function geTableCellata() {
         
-        const endpoint = `${BASE_URL}/group/index`;
+        const endpoint = `${BASE_URL}/sub_category/index`;
     
         try {
           const res = await fetch(endpoint,{
@@ -168,8 +144,9 @@ function Group () {
           });
           
          const data = await res.json();
-          setTableData(data.data);
+          setTableData(data);
           if(res.status !== 401){
+            console.log(data)
             setTableData(data.data); // Set the fetched data to the local state variable
           }
         
@@ -179,6 +156,9 @@ function Group () {
         setLoading(false);
       }
     
+
+
+      
       const handleChange = (e) => {
         // file type m value nhi hoti h wait sochne do conditon lgegi yha
         const {name, value} = e.target;
@@ -192,24 +172,15 @@ function Group () {
       const handleSubmit = async (e) => {
         e.preventDefault();
          setLoading(true);
-        const endpoint = `${BASE_URL}/group/create`;
+        const endpoint = `${BASE_URL}/sub_category/create`;
        let em = [];
        
        
         try {
           const data = {
-           
-            branch_id: formData.branch_id,
-            user_id: formData.user_id,
+            category_id: formData.category_id,
             name: formData.name,
-            max_limit: formData.max_limit,
-            max_member: formData.max_member,
-            emi_date: formData.emi_date,
-            address: formData.address,
-            location: formData.location,
-            address: formData.address,
-            status: formData.status,
-            image: imageData,
+            status:formData.status,
           };
       
           const res = await fetch(endpoint, {
@@ -230,17 +201,9 @@ function Group () {
             console.log(responseData.message)
             setFormData(
               {
-          branch_id: '',
-          user_id: '',
-          name: '',
-          max_limit: '',
-          max_member: '',
-         emi_date: '',
-         address: '',
-         location: '',
-         address: '',
-         image: '',
-         status: '',
+               
+                name: '',
+                status: '',
               
                 }
             )
@@ -293,9 +256,7 @@ function Group () {
 
       useEffect(() => {
         geTableCellata();
-        fetchBranchs();
-        fetchMembers();
-
+        fetchCategories();
      }, []);
 
     const [page, setPage] = useState(0);
@@ -310,7 +271,6 @@ function Group () {
       setPage(0);
     };
 
-  
     const handleOpen = (item) => {
       setEditedItem(item)
       setOpen(true);
@@ -338,7 +298,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const deleteItem = async () => {
     const token = localStorage.getItem('accessToken');
 
-    const endpoint = `${BASE_URL}/group/destroy`;
+    const endpoint = `${BASE_URL}/sub_category/destroy`;
     try {
       const data = {
         id: deletedItemId,
@@ -370,7 +330,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
      <div className='componentLoader'>  { loading? ( <Loading /> ) : ( "" ) } </div>
         <Container>
         <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Group', path: '/master/group' }, { name: 'Form' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Business Types', path: '/master/businesstypes' }, { name: 'Form' }]} />
       </Box>
       {
         errorMsg && errorMsg.length > 0 && errorMsg.map((error, index)=>(
@@ -392,167 +352,60 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
       }
       
       <Stack spacing={3}>
-        <SimpleCard title="Group Form">
+        <SimpleCard title="Business Types Form">
 
 
-   
-      <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-        <Grid container spacing={3}>
-                
-<Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel>Branch Name *</InputLabel>
-        <Select
-          name="branch_id"
-          onChange={handleChange}
-          value={formData.branch_id}
-          required
-        >
-          {/* Map over branchs to generate MenuItem components */}
-          {branchs.map((branch) => (
-            <MenuItem key={branch.id} value={branch.id}>
-              {branch.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-    <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel>Group Leader *</InputLabel>
-        <Select
-          name="user_id"
-          onChange={handleChange}
-          value={formData.user_id}
-          required
-        >
-          {/* Map over branchs to generate MenuItem components */}
-          {members.map((member) => (
-            <MenuItem key={member.id} value={member.id}>
-              {member.first_name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              name="name"
-              label="Name"
-              size="small"
-              onChange={handleChange}
-              value={formData.name} 
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
+        <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
 
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="number"
-              name="max_limit"
-              label="Max Limit"
-              size="small"
-              onChange={handleChange}
-              value={formData.max_limit} 
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-         
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="number"
-              name="max_member"
-              label="Max Member"
-              size="small"
-              onChange={handleChange}
-              value={formData.max_member} 
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="file"
-              name="image"
-              size="small"
-              label="Image"
-              onChange={handleFileChange}
-          
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="number"
-              name="emi_date"
-              label="Emi Date"
-              size="small"
-              InputProps={{ inputProps: { min: 1, max: 31}}}
-              onChange={handleChange}
-              value={formData.emi_date} 
-             
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-         
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              size="small"
-              name="location"
-              label="Location"
-              value={formData.location} 
-              onChange={handleChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl size="small" fullWidth>
-        <InputLabel>Status</InputLabel>
-        <Select
-          name="status"
-          onChange={handleChange}
-          value={formData.status}
-          required
-        >
-          <MenuItem value="active">Active</MenuItem> 
-          <MenuItem value="deactive">Deactive</MenuItem> 
-        </Select>
-      </FormControl>
-    </Grid>
- <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              name="address"
-              label="Address"
-              size="small"
-              value={formData.address} 
-              multiline
-              minRows={4}
-              maxRows={4}
-              onChange={handleChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-        </Grid>
+<Grid container spacing={3}>
+  
 
-        <Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
-          <Icon>send</Icon>
-          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-        </Button>
-      </ValidatorForm>
+
+
+
+  <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+    <TextField
+      type="text"
+      name="name"
+      label="Name"
+      size="small"
+      onChange={handleChange}
+      value={formData.name} 
+      validators={["required"]}
+      errorMessages={["this field is required"]}
+    /> 
+  </Grid>
+ 
+  {/* <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      name="status"
+                      onChange={handleChange}
+                      value={formData.status}
+                    >
+                      <MenuItem value="active">Active</MenuItem>
+                      <MenuItem value="deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid> */}
+ 
+
+</Grid>
+
+<Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
+  <Icon>send</Icon>
+  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
+</Button>
+</ValidatorForm>
+
       </SimpleCard>
       </Stack>
       </Container>
 
 
       <Container>
-      <SimpleCard title="Group Table">
+      <SimpleCard title="Business Types Table">
       <ValidatorForm  className="filterForm">
       <Grid container spacing={2}>
         <Grid item xs={12} md={3}>
@@ -619,16 +472,8 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
      <TableHead>
     
        <TableRow>
-            <TableCell align="left">Sr no.</TableCell>
-            <TableCell align="center">Branch</TableCell>
-            <TableCell align="center">Group Leader</TableCell>
+         <TableCell align="left">Sr no.</TableCell>
             <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Max Limit</TableCell>
-            <TableCell align="center">Max Member</TableCell>
-            <TableCell align="center">Emi Date </TableCell>
-            <TableCell align="center">Address</TableCell>
-            <TableCell align="center">Location</TableCell>
-            <TableCell align="center">image</TableCell>
             <TableCell align="center">Status</TableCell>
             <TableCell align="right">Option</TableCell>
          
@@ -640,27 +485,9 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
          .map((item, index) => (
            <TableRow key={index}>
              <TableCell align="left">{index + 1}</TableCell>
-             <TableCell align="center">{item.branch_name}</TableCell>
-             <TableCell align="center">{item.user_name}</TableCell>
-                <TableCell align="center">{item.name}</TableCell>
-                <TableCell align="center">{item.max_limit}</TableCell>
-                <TableCell align="center">{item.max_member}</TableCell>
-                <TableCell align="center">{item.emi_date}</TableCell>
-                <TableCell align="center">{item.address}</TableCell>
-                <TableCell align="center">{item.location}</TableCell>
-             <TableCell align="center">
-        {item.image ? (
-          <a href={item.image} target="_blank" rel="noopener noreferrer">
-            <img
-              style={{ height: '50px', width: '50px' }}
-              src={item.image}
-              alt="Item Image"
-            />
-          </a>
-        ) : (
-          <span>No Image Available</span>
-        )}
-      </TableCell>
+             
+             <TableCell align="center">{item.name}</TableCell>
+             
             
       <TableCell align="center">
   <Small className={item.status === 'active' ? 'green_status' : 'red_status'
@@ -675,7 +502,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
              onClick={() => handleOpen(item)}>
 <Icon>edit</Icon>
 </ModeTwoToneIcon>
-           <GroupEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+           {/* <SubCategoryEdit editedItem={editedItem} handleClose={handleClose} open={open} /> */}
            <DeleteOutlineTwoToneIcon onClick={()=>handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
 <Icon>delete</Icon>
 </DeleteOutlineTwoToneIcon>
@@ -722,4 +549,4 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   )
 }
 
-export default Group;
+export default BusinessTypes;

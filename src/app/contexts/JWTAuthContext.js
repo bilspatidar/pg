@@ -4,7 +4,7 @@ import { MatxLoading } from 'app/components';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify'; // Import toast from react-toastify
 import jwtDecode from 'jwt-decode';
-const BASE_URL = 'https://c7cf-59-91-132-132.ngrok-free.app/';
+const BASE_URL = 'https://cp.sparkhub.in/';
 const initialState = {
   user: null,
   isInitialised: false,
@@ -23,7 +23,7 @@ const isValidToken = (accessToken) => {
 const setSession = (accessToken) => {
   if (accessToken) {
     localStorage.setItem('accessToken', accessToken);
-    axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+    axios.defaults.headers.common.Authorization = `${accessToken}`;
   } else {
     localStorage.removeItem('accessToken');
     delete axios.defaults.headers.common.Authorization;
@@ -75,38 +75,39 @@ export const AuthProvider = ({ children }) => {
 
   //   dispatch({ type: 'LOGIN', payload: { user } });
   // };
- const login = async (email, password) => {  
-    try {
-      const response = await fetch(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username:email, password }),
-      });
-  
-      if (!response.ok) {
-        throw new Error('Login failed'); // Handle non-200 response
-      }
-  
-      const data = await response.json();
-      console.log(data)
-      const  {token}  = data;
-      console.log("data after login:", token); // ye isme ky data mi
-      
-      localStorage.setItem('accessToken', token);
+ const login = async (email, password) => {
+  try {
+    const response = await fetch(`${BASE_URL}api/user/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password }) // Shorthand for { email: email, password: password }
+    });
 
-      dispatch({ type: 'LOGIN', payload: { user:token } });
+    if (!response.ok) {
+      throw new Error('Login failed'); // Handle non-200 response
+    }
 
-      // Redirect to dashboard on successful login
+    const data = await response.json();
+    const token = data.access_token; // Access the token directly from data
+
+    console.log('data after login:', token);
+
+    localStorage.setItem('accessToken', token);
+
+    // Assuming dispatch is defined elsewhere and accessible here
+    dispatch({ type: 'LOGIN', payload: { user: token } });
+
+    // Redirect to dashboard on successful login
     navigate('/'); // Make sure to import and use useNavigate here
     toast.success('Login successful! Redirecting to the dashboard.');
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred during login. Please try again.');
-      // Handle any error that occurred during login
-    }
-  };
+  } catch (error) {
+    console.error(error);
+    toast.error('An error occurred during login. Please try again.');
+    // Handle any error that occurred during login
+  }
+};
 
   const register = async (email, username, password) => {
     const response = await axios.post('/api/auth/register', { email, username, password });
@@ -119,7 +120,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('accessToken');
     dispatch({ type: 'LOGOUT' });
   };
-  
 
   // useEffect(() => {
   //   (async () => {
@@ -128,7 +128,7 @@ export const AuthProvider = ({ children }) => {
   //     } catch (err) {
   //       console.error(err);
   //       // dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null } });
-  //      // 
+  //      //
   //     }
   //   })();
   // }, []);
@@ -136,10 +136,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     const isAuthenticated = !!storedToken;
-    console.log(isAuthenticated)
-  
-    if (isAuthenticated) {  
-      dispatch({ type: 'INIT', payload: { isAuthenticated: true, user:storedToken } });
+    console.log(isAuthenticated);
+
+    if (isAuthenticated) {
+      dispatch({ type: 'INIT', payload: { isAuthenticated: true, user: storedToken } });
     } else {
       dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null } });
     }

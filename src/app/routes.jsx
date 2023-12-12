@@ -4,16 +4,20 @@ import AuthGuard from './auth/AuthGuard';
 import { authRoles } from './auth/authRoles';
 import Loadable from './components/Loadable';
 import MatxLayout from './components/MatxLayout/MatxLayout';
-import Branch from './components/Master/Branch';
-import Category from './components/Master/Category';
-import SubCategory from './components/Master/SubCategory';
-import Group from './components/Master/Group';
-import SubGroup from './components/Master/SubGroup';
-import Product from './components/Master/Product';
-import AddMember from './components/member/AddMember';
+import Subcategories from './components/Master/Subcategories';
+import BusinessTypes from './components/Master/BusinessTypes';
+import Categories from './components/Master/Categories';
+import ManageCurrencies from './components/Master/ManageCurrencies';
+import DocumentTypes from './components/Master/DocumentType';
+import DocumentCategories from './components/Master/DocumentCategories';
+
+
+
 import Profile from './components/user/Profile';
 import Managepassword from './components/user/Managepassword';
-   
+import Payment_gateway from './components/PaymentGateway/Payment_gateway';
+
+
 
 
 
@@ -37,7 +41,7 @@ const routes = [
       </AuthGuard>
     ),
     children: [
- 
+
       // dashboard route
       {
         path: '/dashboard/default',
@@ -46,21 +50,24 @@ const routes = [
       },
       { path: '/', element: <Navigate to="dashboard/default" /> },
 
-      // e-chart rooute
-    
-      { path: '/master/branch', element: <Branch /> },
-      { path: '/master/category', element: <Category /> }, 
-      { path: '/master/subcategory', element: <SubCategory /> },  
-      { path: '/master/group', element: <Group /> },
-      { path: '/master/subgroup', element: <SubGroup /> },  
-      { path: '/master/product', element: <Product /> },  
-      
-      { path: '/member/addmember', element: <AddMember /> },
+      { path: '/master/subcategories', element: <Subcategories /> },
+      { path: '/master/BusinessTypes', element: <BusinessTypes /> },
+      { path: '/master/Categories', element: <Categories /> },
+      { path: '/master/currency', element: <ManageCurrencies /> },
+      { path: '/master/DocumentTypes', element: <DocumentTypes /> },
+      { path: '/master/DocumentCategories', element: <DocumentCategories /> },
 
-      { path: '/member/allmember', element: <Category /> },  
-      { path: '/member/allmember', element: <Category /> },  
-      { path: '/user/profile', element: <Profile />  },
-      { path: '/user/Managepassword', element: <Managepassword />  },
+      { path: '/user/profile', element: <Profile /> },
+      { path: '/user/Managepassword', element: <Managepassword /> },
+
+      { path: '/PaymentGateway/Payment_gateway', element: <Payment_gateway /> },
+
+
+    
+
+     
+     
+
     ]
   },
 

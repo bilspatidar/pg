@@ -7,7 +7,7 @@ import { Span } from "app/components/Typography";
 import { ValidatorForm } from "react-material-ui-form-validator";
 import { TextField, Grid, Select, MenuItem, Icon, FormControl, InputLabel, } from '@mui/material';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
-import {BASE_URL} from './../../config';
+import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 
@@ -23,7 +23,7 @@ const style = {
   p: 4,
 };
 
-function BranchEdit({ handleClose, open, editedItem }) {
+function CategoriesEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
@@ -31,94 +31,87 @@ function BranchEdit({ handleClose, open, editedItem }) {
   const [errorMsg, setErrorMsg] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
+    shortName: '',
     status: '',
-    phone: '',
-    location: '',
-    code:'',
-    address:'',
-    });
-// const refreshTable = () => {
-//   //setTableData(tableData);
-//   tableData();
-// }
-const handleChange = (e) => {
-        const {name, value} = e.target;
-        setFormData({
-          ...formData,
-          [name]: value
-        })
-      }
+  });
+  // const refreshTable = () => {
+  //   //setTableData(tableData);
+  //   tableData();
+  // }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/branch/update`;
-   let em = [];
-   
-   
+    const endpoint = `${BASE_URL}/api/category/category/update`;
+    let em = [];
+
+
     try {
       const data = {
         id: formData.id,
-        name: formData.name,
-        email: formData.email,
-        code: formData.code,
-        address: formData.address,
+       name: formData.name,
+        shortName: formData.shortName,
         status: formData.status,
-        phone: formData.phone,
-        location: formData.location,
+
       };
-  
+
       const res = await fetch(endpoint, {
-        method: "PATCH",
+        method: "POST",
         body: JSON.stringify(data),
         headers: new Headers({
-          "ngrok-skip-browser-warning": true,
+          // "ngrok-skip-browser-warning": true,
           "token": token,
           'Content-Type': 'application/json'
         }),
       });
-      
+
 
       if (res.status === 200) {
         const responseData = await res.json();
         ///toast.success(responseData.message);
         console.log(responseData.message)
         //setTableData(tableData);
-        let obj = {bgType: "success", message:`${responseData.message}`};
+        let obj = { bgType: "success", message: `${responseData.message}` };
         em.push(obj);
       } else {
 
-       
+
         const errorData = await res.json();
         //toast(errorData.message);
-        let obj = {bgType: "error", message:`${errorData.message}`};
+        let obj = { bgType: "error", message: `${errorData.message}` };
 
         em.push(obj);
         // bgtype = 'error';
-       if (errorData.error) { 
+        if (errorData.error) {
           for (const key in errorData.error) {
             if (errorData.error.hasOwnProperty(key)) {
               const errorMessages = errorData.error[key].join(', '); // Combine multiple error messages if any
               //toast.error(`${key}: ${errorMessages}`);
-              let obj = {bgType: "error", message: `${key}: ${errorMessages}`};
+              let obj = { bgType: "error", message: `${key}: ${errorMessages}` };
               // em.push(`${key}: ${errorMessages}`);
               em.push(obj);
-             
+
 
             }
           }
           console.log(em)
-         
+
           console.log(errorMsg)
-          
+
         }
-      
+
       }
     } catch (error) {
       console.log(error)
-      let obj = {bgType: "error", message:`${error.message}`};
+      let obj = { bgType: "error", message: `${error.message}` };
 
-       em.push(obj);
+      em.push(obj);
 
     }
     setErrorMsg(em)
@@ -130,37 +123,36 @@ const handleChange = (e) => {
     setFormData({
       id: editedItem.id,
       name: editedItem.name,
-      email: editedItem.email,
-      code: editedItem.code,
-      address: editedItem.address,
+      shortName: editedItem.shortName,
       status: editedItem.status,
-      phone: editedItem.phone,
-      location: editedItem.location,
+
+
+
     })
   }, [editedItem])
-  
+
 
   return (
     <>
-    {
-        errorMsg && errorMsg.length > 0 && errorMsg.map((error, index)=>(
+      {
+        errorMsg && errorMsg.length > 0 && errorMsg.map((error, index) => (
           <div key={index}>
-<CustomSnackbar
-        message={
-          <ul> 
-            {errorMsg.map((error, index) => (
-              <li key={index} className={index === 0 ? 'first-li-error-msg' : 'li-error-msg'}>{error.message} </li>
-            ))}
-          </ul>
-        }
-        severity={ errorMsg[0].bgType }
-        autoHideDuration={4000}
-        onClose={() => setErrorMsg([])}
-      />
-</div>
+            <CustomSnackbar
+              message={
+                <ul>
+                  {errorMsg.map((error, index) => (
+                    <li key={index} className={index === 0 ? 'first-li-error-msg' : 'li-error-msg'}>{error.message} </li>
+                  ))}
+                </ul>
+              }
+              severity={errorMsg[0].bgType}
+              autoHideDuration={4000}
+              onClose={() => setErrorMsg([])}
+            />
+          </div>
         ))
       }
-      
+
       <Modal
         open={open}
         onClose={handleClose}
@@ -180,21 +172,18 @@ const handleChange = (e) => {
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <ValidatorForm className="custom-form-control" onSubmit={handleSubmit} onError={() => null}>
-            <TextField
-  fullWidth
-  type="hidden"
-  name="id"
-  label="Id"
-  size="small"
-  onChange={handleChange}
-  value={formData.id}
-  style={{ display: 'none' }}
-/>
+              <TextField
+                fullWidth
+                type="hidden"
+                name="id"
+                label="Id"
+                size="small"
+                onChange={handleChange}
+                value={formData.id}
+                style={{ display: 'none' }}
+              />
               <Grid container spacing={3}>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-
-               
-
 
                   <TextField fullWidth
                     type="text"
@@ -209,52 +198,17 @@ const handleChange = (e) => {
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField fullWidth
-                    type="email"
-                    name="email"
-                    label="Email"
-                    size="small"
-                    value={formData.email}
-                    onChange={handleChange}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
-                    type="number"
-                    name="phone"
-                    label="Mobile"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.phone}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
                     type="text"
-                    name="code"
-                    label="Code"
+                    name="shortName"
+                    label="Short Name "
                     size="small"
-                    onChange={handleChange}
-                    value={formData.code}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
-                    type="text"
-                    name="location"
-                    label="Location"
-                    size="small"
-                    value={formData.location}
+                    value={formData.shortName}
                     onChange={handleChange}
                     validators={["required"]}
                     errorMessages={["This field is required"]}
                   />
                 </Grid>
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
                     <InputLabel>Status</InputLabel>
@@ -263,25 +217,10 @@ const handleChange = (e) => {
                       onChange={handleChange}
                       value={formData.status}
                     >
-                      <MenuItem value="active">Active</MenuItem>
-                      <MenuItem value="deactive">Deactive</MenuItem>
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
                     </Select>
                   </FormControl>
-                </Grid>
-                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
-                    type="text"
-                    name="address"
-                    label="Address"
-                    size="small"
-                    multiline
-                    minRows={4}
-                    maxRows={4}
-                    onChange={handleChange}
-                    value={formData.address}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
                 </Grid>
               </Grid>
               <Button
@@ -302,4 +241,4 @@ const handleChange = (e) => {
   );
 }
 
-export default BranchEdit;
+export default CategoriesEdit;

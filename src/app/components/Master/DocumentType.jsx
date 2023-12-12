@@ -1,5 +1,5 @@
 import React, { useRef,JWTAuthContext } from 'react'
-import {BASE_URL} from './../../config';
+import {BASE_URL} from '../../config';
 import { Stack } from '@mui/material';
 import { Box, styled } from '@mui/material';
 import { Breadcrumb, SimpleCard } from 'app/components';
@@ -11,6 +11,7 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 
 import {
   Button,
@@ -34,7 +35,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import BranchEdit from './BranchEdit';
+// import SubCategoryEdit from './SubCategoryEdit';
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -70,7 +71,7 @@ const Small = styled('small')(({ bgcolor }) => ({
     },
   }));
 
-function Branch () {
+function DocumentTypes () {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
@@ -96,25 +97,42 @@ function Branch () {
 
 
     const [formData, setFormData] = useState({
+    
       name: '',
-      email: '',
       status: '',
-      phone: '',
-      location: '',
-      code:'',
-      address:'',
       });
+
+      const [categories, setCategories] = useState([]);
+
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
     
-    
-    
+    const [imageData, setImageData] = useState('');
+
+    const fetchCategories = async () => {
+      const endpoint = `${BASE_URL}/category/index`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "get",
+          headers: new Headers({
+            "ngrok-skip-browser-warning": true,
+            "token": token
+          }),  
+        })
+
+        const {data} = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.log(error)
+      }
+    }
     
       
       //Get Data from API 
       async function geTableCellata() {
         
-        const endpoint = `${BASE_URL}/branch/index`;
+        const endpoint = `${BASE_URL}/sub_category/index`;
     
         try {
           const res = await fetch(endpoint,{
@@ -122,12 +140,13 @@ function Branch () {
             headers: new Headers({
               "ngrok-skip-browser-warning": true,
               "token": token
-            }),
+            }),  
           });
           
          const data = await res.json();
-          setTableData(data.data);
+          setTableData(data);
           if(res.status !== 401){
+            console.log(data)
             setTableData(data.data); // Set the fetched data to the local state variable
           }
         
@@ -137,7 +156,11 @@ function Branch () {
         setLoading(false);
       }
     
+
+
+      
       const handleChange = (e) => {
+        // file type m value nhi hoti h wait sochne do conditon lgegi yha
         const {name, value} = e.target;
         setFormData({
           ...formData,
@@ -149,19 +172,15 @@ function Branch () {
       const handleSubmit = async (e) => {
         e.preventDefault();
          setLoading(true);
-        const endpoint = `${BASE_URL}/branch/create`;
+        const endpoint = `${BASE_URL}/sub_category/create`;
        let em = [];
        
        
         try {
           const data = {
+            category_id: formData.category_id,
             name: formData.name,
-            email: formData.email,
-            code: formData.code,
-            address: formData.address,
-            status: formData.status,
-            phone: formData.phone,
-            location: formData.location,
+            status:formData.status,
           };
       
           const res = await fetch(endpoint, {
@@ -182,13 +201,10 @@ function Branch () {
             console.log(responseData.message)
             setFormData(
               {
+               
                 name: '',
-                email: '',
                 status: '',
-                phone: '',
-                location: '',
-                code:'',
-                address:'',
+              
                 }
             )
             let obj = {bgType: "success", message:`${responseData.message}`};
@@ -233,8 +249,14 @@ function Branch () {
         setLoading(false);
       };
       
+
+      const handleFileChange = (e) => {
+        handleFileInputChange(e,setImageData);
+      };
+
       useEffect(() => {
         geTableCellata();
+        fetchCategories();
      }, []);
 
     const [page, setPage] = useState(0);
@@ -249,7 +271,6 @@ function Branch () {
       setPage(0);
     };
 
-    
     const handleOpen = (item) => {
       setEditedItem(item)
       setOpen(true);
@@ -277,7 +298,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const deleteItem = async () => {
     const token = localStorage.getItem('accessToken');
 
-    const endpoint = `${BASE_URL}/branch/destroy`;
+    const endpoint = `${BASE_URL}/sub_category/destroy`;
     try {
       const data = {
         id: deletedItemId,
@@ -303,15 +324,13 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     handleDeleteModalClose()
   }
 
-
+    
   return (
     <>
-         
-       <div className='componentLoader'>  { loading? ( <Loading /> ) : ( "" ) } </div>
+     <div className='componentLoader'>  { loading? ( <Loading /> ) : ( "" ) } </div>
         <Container>
         <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Material', path: '/material' }, 
-        { name: 'Form' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Document Types', path: '/master/Documenttypes' }, { name: 'Form' }]} />
       </Box>
       {
         errorMsg && errorMsg.length > 0 && errorMsg.map((error, index)=>(
@@ -332,262 +351,182 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
         ))
       }
       
-    
       <Stack spacing={3}>
-        <SimpleCard title="Branch Form">
+        <SimpleCard title="Document Types Form">
 
 
-    <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-        <Grid container spacing={3}>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-              <TextField
-                type="text"
-                name="name"
-                label="Name"
-                size="small"
-                onChange={handleChange}
-                value={formData.name} 
-                validators={["required"]}
-                errorMessages={["this field is required"]}
-              /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="email"
-              name="email"
-              size="small"
-              label="Email"
-              value={formData.email} 
-              onChange={handleChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="number"
-              name="phone"
-              label="Mobile"
-              size="small"
-              onChange={handleChange}
-              value={formData.phone} 
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-              <TextField
-                type="text"
-                name="code"
-                label="Code"
-                size="small"
-                onChange={handleChange}
-                value={formData.code} 
-                validators={["required"]}
-                errorMessages={["this field is required"]}
-              /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              name="location"
-              label="Location"
-              size="small"
-              value={formData.location} 
-              onChange={handleChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl size="small" fullWidth>
-        <InputLabel>Status</InputLabel>
-        <Select
-          name="status"
-          onChange={handleChange}
-          value={formData.status}
-          required
-        >
-          <MenuItem value="active">Active</MenuItem> 
-          <MenuItem value="deactive">Deactive</MenuItem> 
-        </Select>
-      </FormControl>
-    </Grid>
+        <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
 
-          <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              name="address"
-              label="Address"
-              size="small"
-              value={formData.address} 
-              multiline
-              minRows={4}
-              maxRows={4}
-              onChange={handleChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
+<Grid container spacing={3}>
+ 
+  <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+    <TextField
+      type="text"
+      name="document_type"
+      label="Document Type"
+      size="small"
+      onChange={handleChange}
+      value={formData.document_type} 
+      validators={["required"]}
+      errorMessages={["this field is required"]}
+    /> 
+  </Grid>
+ 
+  {/* <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      name="status"
+                      onChange={handleChange}
+                      value={formData.status}
+                    >
+                      <MenuItem value="active">Active</MenuItem>
+                      <MenuItem value="deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid> */}
+ 
 
-        </Grid>
+</Grid>
 
-        <Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
-          <Icon>send</Icon>
-          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-        </Button>
-      </ValidatorForm>
+<Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
+  <Icon>send</Icon>
+  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
+</Button>
+</ValidatorForm>
 
       </SimpleCard>
       </Stack>
       </Container>
+
+
       <Container>
-      <SimpleCard title="Branch Table">
-     
-      {/* Your other components */}
-      <ValidatorForm className="filterForm" onSubmit={handleFilterSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={3}>
-            <TextField
-              id="filterName"
-              name="name"
-              label="Name"
-              variant="outlined"
-              size="small"
-              fullWidth
-              value={filterCriteria.name}
-              onChange={handleFilterChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <TextField
-              id="filterFromDate"
-              name="fromDate"
-              label="From Date"
-              type="date"
-              variant="outlined"
-              size="small"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={filterCriteria.fromDate}
-              onChange={handleFilterChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={3}>
-            <TextField
-              id="filterToDate"
-              name="toDate"
-              label="To Date"
-              type="date"
-              variant="outlined"
-              size="small"
-              fullWidth
-              InputLabelProps={{
-                shrink: true,
-              }}
-              value={filterCriteria.toDate}
-              onChange={handleFilterChange}
-            />
-          </Grid>
-          <Grid item xs={12} md={2}>
-            <Button color="primary" variant="contained" type="submit">
-              <Icon>send</Icon>
-              <Span sx={{ pl: 1, textTransform: "capitalize" }}>Search</Span>
-            </Button>
-          </Grid>
+      <SimpleCard title="Document Types Table">
+      <ValidatorForm  className="filterForm">
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={3}>
+          <TextField
+            id="filterTwo"
+            label="Booking No"
+            variant="outlined"
+            size="small"
+            fullWidth
+          />
         </Grid>
-      </ValidatorForm>
-  
-   
-      <Box width="100%" overflow="auto" mt={2}>
- <Button
-         
-          variant="contained"
-          // color="primary"
-          onClick={()=>handlePrint()}
-          style={{
-            backgroundColor: '#2A0604', // Set the desired darker color
-            color: 'white', 
-            height:30,
-          }}
-        >
-          Print
-          
+        <Grid item xs={12} md={3}>
+          <TextField
+            id="filterFour"
+            label="From Date"
+            type="date"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <TextField
+            id="filterFive"
+            label="To Date"
+            type="date"
+            variant="outlined"
+            size="small"
+            fullWidth
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={2}>
+        <Button color="primary" variant="contained" type="submit">
+          <Icon>send</Icon>
+          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Search</Span>
         </Button>
-      
-      <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
+        </Grid>
+      </Grid>
+    </ValidatorForm >
+      <Box width="100%" overflow="auto"mt={2}>
+      <Button
+         
+         variant="contained"
+         // color="primary"
+         onClick={()=>handlePrint()}
+         style={{
+           backgroundColor: '#2A0604', // Set the desired darker color
+           color: 'white', 
+           height:30,
+         }}
+       >
+         Print
+         
+       </Button>
      
-        <TableHead>
-       
-          <TableRow>
-            <TableCell align="left">Sr no.</TableCell>
-            <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Mobile</TableCell>
-            <TableCell align="center">Email</TableCell>
-            <TableCell align="center">Code </TableCell>
-            <TableCell align="center">Location</TableCell>
-            <TableCell align="center">Address</TableCell>
+       <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
+     
+     <TableHead>
+    
+       <TableRow>
+         <TableCell align="left">Sr no.</TableCell>
+            <TableCell align="center">Document Types</TableCell>
             <TableCell align="center">Status</TableCell>
             <TableCell align="right">Option</TableCell>
-            
-          </TableRow>
-        </TableHead>
+         
+       </TableRow>
+     </TableHead>
 
-        <TableBody>
-          {tableData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            .map((item, index) => (
-              <TableRow key={index}>
-                <TableCell align="left">{index + 1}</TableCell>
-                <TableCell align="center">{item.name}</TableCell>
-                <TableCell align="center">{item.phone}</TableCell>
-                <TableCell align="center">{item.email}</TableCell>
-                <TableCell align="center">{item.code}</TableCell>
-                <TableCell align="center">{item.location}</TableCell>
-                <TableCell align="center">{item.address}</TableCell>
-                <TableCell align="center">
+     <TableBody>
+       {tableData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+         .map((item, index) => (
+           <TableRow key={index}>
+             <TableCell align="left">{index + 1}</TableCell>
+             
+             <TableCell align="center">{item.document_types}</TableCell>
+             
+            
+      <TableCell align="center">
   <Small className={item.status === 'active' ? 'green_status' : 'red_status'
   }>
     {item.status}
   </Small>
 </TableCell>
-                <TableCell align="right">
-                
-              
-                <ModeTwoToneIcon  fontSize="small" style={{ color: '#173853' }} 
-                onClick={() => handleOpen(item)}>
-  <Icon>edit</Icon>
+             <TableCell align="right">
+             
+           
+             <ModeTwoToneIcon  fontSize="small" style={{ color: '#173853' }} 
+             onClick={() => handleOpen(item)}>
+<Icon>edit</Icon>
 </ModeTwoToneIcon>
-              <BranchEdit editedItem={editedItem} handleClose={handleClose} open={open} />
-              <DeleteOutlineTwoToneIcon onClick={()=>handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
-  <Icon>delete</Icon>
+           {/* <SubCategoryEdit editedItem={editedItem} handleClose={handleClose} open={open} /> */}
+           <DeleteOutlineTwoToneIcon onClick={()=>handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
+<Icon>delete</Icon>
 </DeleteOutlineTwoToneIcon>
-              <Dialog actionButtonhandler={deleteItem} open={openDeleteModal} handleClose={handleDeleteModalClose} />
-                </TableCell>
-                
-              </TableRow>
-            ))}
-        </TableBody>
+           <Dialog actionButtonhandler={deleteItem} open={openDeleteModal} handleClose={handleDeleteModalClose} />
+             </TableCell>
+             
+           </TableRow>
+         ))}
+     </TableBody>
 
-      </StyledTable>
+   </StyledTable>
+
 
       <TablePagination
         sx={{ px: 2 }}
         page={page}
         component="div"
         rowsPerPage={rowsPerPage}
-        count={tableData?.length}
+        count={tableData.length}
         onPageChange={handleChangePage}
-        rowsPerPageOptions={[5, 10,15,25,50]}
+        rowsPerPageOptions={[5, 10, 25]}
         onRowsPerPageChange={handleChangeRowsPerPage}
         nextIconButtonProps={{ "aria-label": "Next Page" }}
         backIconButtonProps={{ "aria-label": "Previous Page" }}
       />
     </Box>
-    </SimpleCard>
+    </SimpleCard> 
     </Container>
-
     <ToastContainer
             style={{ minWidth: "360px", width: "auto", maxWidth: "500px" }}
             position="top-center"
@@ -606,6 +545,4 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   )
 }
 
-export default Branch;
-
-// https://www.einfosoft.com/templates/admin/spice/source/user_profile.html
+export default DocumentTypes;
