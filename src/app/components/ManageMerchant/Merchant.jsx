@@ -34,7 +34,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import PaymentgatewayEdit from './PaymentgatewayEdit';
+// import MerchantEdit from './MerchantEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -70,7 +70,7 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }));
 
-function Payment_gateway() {
+function Merchant() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
@@ -95,8 +95,17 @@ function Payment_gateway() {
   const tableRef = useRef(null);
 
 
+  const [categories, setCategories] = useState([]);
+  const [Countries, setCountries] = useState([]);
+  const [cities, setcities] = useState([]);
+  const [businesstypes, setbusinesstypes] = useState([]);
+  const [subcategories, setsubcategories] = useState([]);
+  const [states, setstates] = useState([]);
+
+
+
   const [formData, setFormData] = useState({
-    
+
     name: '',
     email: '',
     mobile: '',
@@ -111,12 +120,12 @@ function Payment_gateway() {
     street_address2: '',
     business_type_id: '',
     business_category_id: '',
-    business_subcategory_id:'',
+    business_subcategory_id: '',
     skypeID: '',
     websiteURL: '',
     business_registered: '',
-    
-    
+
+
 
   });
   const [tableData, setTableData] = useState([]);
@@ -124,7 +133,7 @@ function Payment_gateway() {
 
   const [currencys, setCurrencys] = useState([]);
   const [cardss, setcardss] = useState([
-   
+
   ]);
 
 
@@ -218,21 +227,23 @@ function Payment_gateway() {
     try {
       const data = {
         name: formData.name,
-        
-        short_name: formData.short_name,
-        live_api: formData.live_api,
-        live_secret: formData.live_secret,
-        test_secret: formData.test_secret,
-        test_api: formData.test_api,
-        live_url: formData.live_url,
-        test_url: formData.test_url,
-        daily_limit: formData.daily_limit,
-        minLimit: formData.minLimit,
-        maxLimit: formData.maxLimit,
-        methodName: formData.methodName,
-        currency: formData.currency,
-        cards: formData .cards,
-        blocked_country:formData .blocked_country
+        email: formData.email,
+        mobile: formData.mobile,
+        password: formData.password,
+        confirm_password: formData.confirm_password,
+        company_name: formData.company_name,
+        postal_code: formData.postal_code,
+        country_id: formData.country_id,
+        state_id: formData.state_id,
+        city_id: formData.city_id,
+        street_address: formData.street_address,
+        street_address2: formData.street_address2,
+        business_type_id: formData.business_type_id,
+        business_category_id: formData.business_category_id,
+        business_subcategory_id: formData.business_subcategory_id,
+        skypeID: formData.skypeID,
+        websiteURL: formData.websiteURL,
+        business_registered: formData.business_registered
       };
 
       const res = await fetch(endpoint, {
@@ -253,24 +264,24 @@ function Payment_gateway() {
         console.log(responseData.message)
         setFormData(
           {
-    name: '',
-    email: '',
-    mobile: '',
-    password: '',
-    confirm_password: '',
-    company_name: '',
-    postal_code: '',
-    country_id: '',
-    state_id: '',
-    city_id: '',
-    street_address: '',
-    street_address2: '',
-    business_type_id: '',
-    business_category_id: '',
-    business_subcategory_id:'',
-    skypeID: '',
-    websiteURL: '',
-    business_registered: '',
+            name: '',
+            email: '',
+            mobile: '',
+            password: '',
+            confirm_password: '',
+            company_name: '',
+            postal_code: '',
+            country_id: '',
+            state_id: '',
+            city_id: '',
+            street_address: '',
+            street_address2: '',
+            business_type_id: '',
+            business_category_id: '',
+            business_subcategory_id: '',
+            skypeID: '',
+            websiteURL: '',
+            business_registered: '',
           }
         )
         let obj = { bgType: "success", message: `${responseData.message}` };
@@ -405,7 +416,7 @@ function Payment_gateway() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Payment Gateway', path: '/PaymentGateway/Payment_gateway ' },
+          <Breadcrumb routeSegments={[{ name: 'Manage Merchant', path: '/ManageMerchant/merchant ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -429,7 +440,7 @@ function Payment_gateway() {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Payment Gateway Form">
+          <SimpleCard title="Merchant Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -450,11 +461,11 @@ function Payment_gateway() {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="short_name"
-                    label="short Name"
+                    name="email"
+                    label="Email"
                     size="small"
                     onChange={handleChange}
-                    value={formData.short_name}
+                    value={formData.email}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -462,11 +473,11 @@ function Payment_gateway() {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="live_api"
-                    label="Live Api"
+                    name="password"
+                    label="Password "
                     size="small"
                     onChange={handleChange}
-                    value={formData.live_api}
+                    value={formData.password}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -474,11 +485,11 @@ function Payment_gateway() {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="live_secret"
-                    label="Live Secret"
+                    name="confirm_password"
+                    label="Confirm Password"
                     size="small"
                     onChange={handleChange}
-                    value={formData.live_secret}
+                    value={formData.confirm_password}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -486,11 +497,11 @@ function Payment_gateway() {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="test_api"
-                    label="Test Api"
+                    name="company_name"
+                    label="Company Name"
                     size="small"
                     onChange={handleChange}
-                    value={formData.test_api}
+                    value={formData.company_name}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -498,85 +509,11 @@ function Payment_gateway() {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="test_secret"
-                    label="Test_Secret"
+                    name="postal_code"
+                    label="Postal Code"
                     size="small"
                     onChange={handleChange}
-                    value={formData.test_secret}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="live_url"
-                    label="Live Url"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.live_url}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="test_url"
-                    label="Test Url"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.test_url}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="daily_limit"
-                    label="Daily Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.daily_limit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="minLimit"
-                    label="Min Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.minLimit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="maxLimit"
-                    label="Max Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.maxLimit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="methodName"
-                    label="Method Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.methodName}
+                    value={formData.postal_code}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -584,64 +521,192 @@ function Payment_gateway() {
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel>Currency</InputLabel>
+                    <InputLabel>Country*</InputLabel>
                     <Select
-                      name="currency"
+                      name="category_id"
                       onChange={handleChange}
-                      value={formData.currency}
-                      multiple
-
+                      value={formData.country_id}
+                      required
                     >
-                      {/* Map over categories to generate MenuItem components */}
-                      {currencys.map((currency) => (
-                        <MenuItem key={currency.id} value={currency.currency_code}>
-                          {currency.currency_name}-{currency.currency_code}
+
+                      {Countries.map((country) => (
+                        <MenuItem key={country.id} value={country.id}>
+                          {country.name}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
+                </Grid>
 
+
+
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>State Name *</InputLabel>
+                    <Select
+                      name="state_id"
+                      onChange={handleChange}
+                      value={formData.state_id}
+                      required
+                    >
+
+                      {states.map((state) => (
+                        <MenuItem key={state.id} value={state.name}>
+                          {state.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>City Name *</InputLabel>
+                    <Select
+                      name="category_id"
+                      onChange={handleChange}
+                      value={formData.city_id}
+                      required
+                    >
+
+                      {cities.map((city) => (
+                        <MenuItem key={city.id} value={city.id}>
+                          {city.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Business Type *</InputLabel>
+                    <Select
+                      name="business_type_id"
+                      onChange={handleChange}
+                      value={formData.business_type_id}
+                      required
+                    >
+
+                      {businesstypes.map((businesstype) => (
+                        <MenuItem key={businesstype.id} value={businesstype.id}>
+                          {businesstype.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel>Cards</InputLabel>
+                    <InputLabel>Category Name *</InputLabel>
                     <Select
-                      name="cards"
+                      name="business_category_id"
                       onChange={handleChange}
-                      value={formData.cards}
-                      multiple
-
+                      value={formData.business_category_id}
+                      required
                     >
-                      {/* Map over categories to generate MenuItem components */}
-                      {cardss.map((card) => (
-                        <MenuItem key={card.id} value={card.name}>
-                         
+
+                      {categories.map((category) => (
+                        <MenuItem key={category.id} value={category.id}>
+                          {category.name}
                         </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
-
                 </Grid>
-              
+
+
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Sub Category *</InputLabel>
+                    <Select
+                      name="business_subcategory_id"
+                      onChange={handleChange}
+                      value={formData.business_subcategory_id}
+                      required
+                    >
+
+                      {subcategories.map((subcategory) => (
+                        <MenuItem key={subcategory.id} value={subcategory.name}>
+                          {subcategory.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="blocked_country"
-                    label="Blocked Country"
+                    name="skypeID"
+                    label="Skype ID"
                     size="small"
                     onChange={handleChange}
-                    value={formData.blocked_country}
+                    value={formData.skypeID}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="websiteURL"
+                    label="Website Url"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.websiteURL}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="business_registered"
+                    label="Business Registered"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.business_registered}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
 
 
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="street_address"
+                    label="Street Address"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.street_address}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="street_address2"
+                    label="Street Address 2"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.street_address2}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
 
               </Grid>
 
-              <Button style={{ marginTop: 30 }} color="primary" variant="contained"
+              <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
                 type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
@@ -652,7 +717,7 @@ function Payment_gateway() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Payment Gateway Table">
+        <SimpleCard title="Merchant Table">
           <ValidatorForm className="filterForm">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
@@ -754,7 +819,7 @@ function Payment_gateway() {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <PaymentgatewayEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        {/* <MerchantEdit editedItem={editedItem} handleClose={handleClose} open={open} /> */}
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -801,4 +866,4 @@ function Payment_gateway() {
   )
 }
 
-export default Payment_gateway;
+export default Merchant;

@@ -253,7 +253,7 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Button
+              <Button disabled={loading}
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"

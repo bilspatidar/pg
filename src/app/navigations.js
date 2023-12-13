@@ -41,6 +41,19 @@ export const navigations = [
 
     ]
   },
+  {
+    name: 'Manage Merchant',
+    icon: 'settings',
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Merchant', path: '/ManageMerchant/Merchant', iconText: 'T' },
+    
+
+    ]
+  },
   // {
   //   name: 'Manage Member',
   //   icon: 'tag_faces',

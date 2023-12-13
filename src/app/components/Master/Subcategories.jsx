@@ -397,7 +397,7 @@ function Subcategories() {
 
               </Grid>
 
-              <Button style={{ marginTop: 30 }} color="primary" variant="contained"
+              <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
                 type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>

@@ -500,7 +500,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
 
 
               </Grid>
-              <Button
+              <Button 
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"
