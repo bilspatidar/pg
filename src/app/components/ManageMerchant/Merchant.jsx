@@ -11,7 +11,8 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-
+import useAuth from 'app/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import {
   Button,
   InputLabel,
@@ -94,7 +95,9 @@ function Merchant() {
 
   const tableRef = useRef(null);
 
+  const { logout } = useAuth();
 
+  const history = useNavigate();
   const [categories, setCategories] = useState([]);
   const [Countries, setCountries] = useState([]);
   const [cities, setcities] = useState([]);
@@ -195,7 +198,10 @@ function Merchant() {
       if (res.status !== 401) {
         setTableData(data.data); // Set the fetched data to the local state variable
       }
-
+      if(res.status === 401 && data.message === "Token Time Expire."){
+        await logout();
+        history("session/signin")
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
