@@ -11,6 +11,7 @@ import ManageCurrencies from './components/Master/ManageCurrencies';
 import DocumentTypes from './components/Master/DocumentType';
 import DocumentCategories from './components/Master/DocumentCategories';
 
+import Merchant from './components/ManageMerchant/Merchant';
 
 
 import Profile from './components/user/Profile';
@@ -62,11 +63,7 @@ const routes = [
 
       { path: '/PaymentGateway/Payment_gateway', element: <Payment_gateway /> },
 
-
-    
-
-     
-     
+      { path: '/ManageMerchant/merchant', element: <Merchant /> },
 
     ]
   },

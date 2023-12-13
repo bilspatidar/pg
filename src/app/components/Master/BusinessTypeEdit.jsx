@@ -23,15 +23,15 @@ const style = {
   p: 4,
 };
 
-function CurrencyEdit({ handleClose, open, editedItem }) {
+function BusinessTypeEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
   const [formData, setFormData] = useState({
-    currency_name: '',
-    currency_code: '',
+    name: '',
+   
     status: '',
   });
   // const refreshTable = () => {
@@ -48,15 +48,14 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/currency/currency/update`;
+    const endpoint = `${BASE_URL}/api/business_type/business_type/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-        currency_name: formData.currency_name,
-        currency_code: formData.currency_code,
+       name: formData.name,
         status: formData.status,
 
       };
@@ -122,8 +121,7 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
     console.log(editedItem)
     setFormData({
       id: editedItem.id,
-      currency_name: editedItem.currency_name,
-      currency_code: editedItem.currency_code,
+      name: editedItem.name,
       status: editedItem.status,
 
 
@@ -187,27 +185,16 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
 
                   <TextField fullWidth
                     type="text"
-                    name="currency_name"
-                    label="Currency Name"
+                    name="name"
+                    label="Name"
                     size="small"
                     onChange={handleChange}
-                    value={formData.currency_name}
+                    value={formData.name}
                     validators={["required"]}
                     errorMessages={["This field is required"]}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
-                    type="text"
-                    name="currency_code"
-                    label="Currency Code"
-                    size="small"
-                    value={formData.currency_code}
-                    onChange={handleChange}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
-                </Grid>
+                
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -223,7 +210,7 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Button disabled={loading}
+              <Button
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"
@@ -241,4 +228,4 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default CurrencyEdit;
+export default BusinessTypeEdit;
