@@ -22,8 +22,9 @@ export const navigations = [
       { name: 'Categories', path: '/master/categories', iconText: 'T' },
       { name: ' Sub Categories', path: '/master/Subcategories', iconText: 'F' },
       { name: 'Manage Currencies', path: '/master/currency', iconText: 'T' },
-      { name: 'Document Types', path: '/master/documenttypes', iconText: 'T' },
-      { name: 'Document Sub Types', path: '/master/documentcategories', iconText: 'T' },
+      // { name: 'Document Types', path: '/master/documenttypes', iconText: 'T' },
+      { name: 'Document Categories', path: '/master/documentcategories', iconText: 'T' },
+      { name: 'Document Sub Categories', path: '/master/DocumentSubCategories', iconText: 'T' },
 
     ]
   },

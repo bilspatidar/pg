@@ -10,6 +10,7 @@ import Categories from './components/Master/Categories';
 import ManageCurrencies from './components/Master/ManageCurrencies';
 import DocumentTypes from './components/Master/DocumentType';
 import DocumentCategories from './components/Master/DocumentCategories';
+import DocumentSubCategories from './components/Master/DocumentSubCategories';
 
 import Merchant from './components/ManageMerchant/Merchant';
 
@@ -57,6 +58,7 @@ const routes = [
       { path: '/master/currency', element: <ManageCurrencies /> },
       { path: '/master/DocumentTypes', element: <DocumentTypes /> },
       { path: '/master/DocumentCategories', element: <DocumentCategories /> },
+      { path: '/master/DocumentSubCategories', element: <DocumentSubCategories /> },
 
       { path: '/user/profile', element: <Profile /> },
       { path: '/user/Managepassword', element: <Managepassword /> },
