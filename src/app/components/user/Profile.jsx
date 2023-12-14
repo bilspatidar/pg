@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import './style2.css';
 import AppBar from '@mui/material/AppBar';
 import { makeStyles } from '@mui/styles';
@@ -14,6 +14,9 @@ import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import Divider from '@mui/material/Divider';
 import { FavoriteBorderOutlined, Reply } from '@mui/icons-material';
+import { BASE_URL } from '../../config';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+import { Span } from "app/components/Typography";
 
 import {
   Box, styled, TextField,
@@ -26,6 +29,8 @@ import {
   CardActions,
   Menu,
   LinearProgress,
+  Icon,
+  
 
 } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -50,6 +55,12 @@ const Small = styled('small')(({ bgcolor }) => ({
 
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    '& .MuiTextField-root': {
+      margin: theme.spacing(1),
+      width: '25ch',
+    },
+  },
   progressContainer: {
     marginBottom: theme.spacing(2),
   },
@@ -88,8 +99,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function Profile() {
+function Profile( handleClose, open, editedItem ) {
   const classes = useStyles();
+  const [imageData, setImageData] = useState('');
 
   const blueColorStyle = {
     color: '#6eb5e1', // Set the color to blue
@@ -103,9 +115,7 @@ function Profile() {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+ 
   const [activeTab, setActiveTab] = useState("tab1")
 
   const handleTabClick = (tabId) => {
@@ -140,6 +150,122 @@ function Profile() {
 
 
   };
+  
+  const [loading, setLoading] = useState(true);
+
+  const token = localStorage.getItem('accessToken');
+  const [apiResponse, setApiResponse] = useState(null);
+  const [errorMsg, setErrorMsg] = useState([]);
+  const [formData, setFormData] = useState({
+    name: '',
+   
+    status: '',
+  });
+  // const refreshTable = () => {
+  //   //setTableData(tableData);
+  //   tableData();
+  // }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }
+  const handleFileChange = (e) => {
+     
+        
+    handleFileInputChange(e,setImageData);
+
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const endpoint = `${BASE_URL}/api/business_type/business_type/update`;
+    let em = [];
+
+
+    try {
+      const data = {
+        // id: formData.id,
+       name: formData.name,
+        status: formData.status,
+
+      };
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: new Headers({
+          // "ngrok-skip-browser-warning": true,
+          "token": token,
+          'Content-Type': 'application/json'
+        }),
+      });
+
+
+      if (res.status === 200) {
+        const responseData = await res.json();
+        ///toast.success(responseData.message);
+        console.log(responseData.message)
+        //setTableData(tableData);
+        let obj = { bgType: "success", message: `${responseData.message}` };
+        em.push(obj);
+      } else {
+
+
+        const errorData = await res.json();
+        //toast(errorData.message);
+        let obj = { bgType: "error", message: `${errorData.message}` };
+
+        em.push(obj);
+        // bgtype = 'error';
+        if (errorData.error) {
+          for (const key in errorData.error) {
+            if (errorData.error.hasOwnProperty(key)) {
+              const errorMessages = errorData.error[key].join(', '); // Combine multiple error messages if any
+              //toast.error(`${key}: ${errorMessages}`);
+              let obj = { bgType: "error", message: `${key}: ${errorMessages}` };
+              // em.push(`${key}: ${errorMessages}`);
+              em.push(obj);
+
+
+            }
+          }
+          console.log(em)
+
+          console.log(errorMsg)
+
+        }
+
+      }
+    } catch (error) {
+      console.log(error)
+      let obj = { bgType: "error", message: `${error.message}` };
+
+      em.push(obj);
+
+    }
+    setErrorMsg(em)
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    console.log(editedItem)
+    setFormData({
+     
+    
+      // imageData: editedItem.imageData,
+    })
+    // setImageData(editedItem.image)
+
+  }, [editedItem])
+  
+
+  
+
+
+
   return (
     <>
       <Container>
@@ -371,7 +497,7 @@ function Profile() {
             </CardContent>
           </Card>
         </div>
-
+      
 
         <div className="profile-content card-topline-aqua">
           <div className="row ">
@@ -414,46 +540,103 @@ function Profile() {
                     <div id="biography">
                      
                         <Grid container spacing={2}>
-                          <Grid item md={3} xs={6}>
-                            <div className="b-r">
-                              <Typography variant="subtitle1">
-                                <strong>Full Name</strong>
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                John Deo
-                              </Typography>
-                            </div>
-                          </Grid>
-                          <Grid item md={3} xs={6}>
-                            <div className="b-r">
-                              <Typography variant="subtitle1">
-                                <strong>Mobile</strong>
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                (123) 456 7890
-                              </Typography>
-                            </div>
-                          </Grid>
-                          <Grid item md={3} xs={6}>
-                            <div className="b-r">
-                              <Typography variant="subtitle1">
-                                <strong>Email</strong>
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                johndeo@example.com
-                              </Typography>
-                            </div>
-                          </Grid>
-                          <Grid item md={3} xs={6}>
-                            <div>
-                              <Typography variant="subtitle1">
-                                <strong>Location</strong>
-                              </Typography>
-                              <Typography variant="body2" color="textSecondary">
-                                India
-                              </Typography>
-                            </div>
-                          </Grid>
+                        <form onSubmit={handleSubmit} className={classes.root}>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <h5 className="card-title">About</h5>
+          <p className="small fst-italic">
+            Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.
+          </p>
+          <h5 className="card-title">Profile Details</h5>
+        </Grid>
+        <Grid container spacing={1}>
+               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                  fullWidth
+                    type="text"
+                    label="Full Name"
+                    name="fullName"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.fullName}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    label="Company Name"
+                    name="company"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.company}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    label="Address"
+                    name="address"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.address}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                  fullWidth
+                    type="text"
+                    label="Mobile"
+                    name="mobile"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.mobile}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    label="Email"
+                    name="email"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.email}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+            <TextField fullWidth
+              type="file"
+              name="image"
+              label="Image"
+              size="small"
+              onChange={handleFileChange}
+              validators={["required"]}
+              errorMessages={["this field is required"]}
+            />
+          </Grid>
+          <Button
+  sx={{ marginTop: 3, marginLeft: 4 }} // Adjust the margin value as needed
+  color="primary"
+  variant="contained"
+  type="submit"
+  size="small"
+>
+  <Icon>send</Icon>
+  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
+</Button>
+                </Grid>
+                
+      </Grid>
+    </form>
                         </Grid>
 
 
