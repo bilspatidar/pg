@@ -27,6 +27,7 @@ import {
   TableHead,
   TableRow,
   IconButton,
+  Autocomplete,
   FormControl,
   Select,
 
@@ -36,7 +37,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import SubcategoriesEdit from './SubcategoriesEdit';
+import DocumentSubCategoriesEdit from './DocumentSubCategoriesEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -103,7 +104,7 @@ function DocumentSubCategories() {
 
     document_category_id: '',
     name: '',
-   
+
     // status: '',
   });
   const [tableData, setTableData] = useState([]);
@@ -118,12 +119,12 @@ function DocumentSubCategories() {
       const response = await fetch(endpoint, {
         method: "get",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
+          //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),  
+        }),
       })
 
-      const {data} = await response.json();
+      const { data } = await response.json();
       setdocumentcategories(data);
     } catch (error) {
       console.log(error)
@@ -149,7 +150,7 @@ function DocumentSubCategories() {
       if (res.status !== 401) {
         setTableData(data.data); // Set the fetched data to the local state variable
       }
-      if(res.status === 401 && data.message === "Token Time Expire."){
+      if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
         history("session/signin")
       }
@@ -179,7 +180,7 @@ function DocumentSubCategories() {
       const data = {
         document_category_id: formData.document_category_id,
         name: formData.name,
-       
+
         // status:formData.status,
 
       };
@@ -202,10 +203,10 @@ function DocumentSubCategories() {
         console.log(responseData.message)
         setFormData(
           {
-            document_category_id:'',
-                name: '',
-                // status: '',
-              
+            document_category_id: '',
+            name: '',
+            // status: '',
+
           }
         )
         let obj = { bgType: "success", message: `${responseData.message}` };
@@ -339,7 +340,7 @@ function DocumentSubCategories() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Sub Categories', path: '/master/Subcategories ' },
+          <Breadcrumb routeSegments={[{ name: 'Document Sub Categories', path: '/master/DocumentSubCategories ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -368,7 +369,7 @@ function DocumentSubCategories() {
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
-                
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
@@ -381,26 +382,32 @@ function DocumentSubCategories() {
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
+
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel> Document Category Name *</InputLabel>
-        <Select
-          name="document_category_id"
-          onChange={handleChange}
-          value={formData.document_category_id}
-          required
-        >
-          {/* Map over categories to generate MenuItem components */}
-          {documentcategories.map((documentcategory) => (
-            <MenuItem key={documentcategory.id} value={documentcategory.id}>
-              {documentcategory.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-
-
+                  <Autocomplete
+                    options={documentcategories}
+                    getOptionLabel={(document_category) => document_category.name}
+                    value={documentcategories.find((document_category) => document_category.id === formData.document_category_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'document_category_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Document Category Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
 
               </Grid>
 
@@ -415,7 +422,7 @@ function DocumentSubCategories() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Sub Categories Table">
+        <SimpleCard title="Document Sub Categories Table">
           <ValidatorForm className="filterForm">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
@@ -499,7 +506,7 @@ function DocumentSubCategories() {
                       <TableCell align="left">{index + 1}</TableCell>
                       <TableCell align="center">{item.document_category_id}</TableCell>
                       <TableCell align="center">{item.name}</TableCell>
-                     
+
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -514,7 +521,7 @@ function DocumentSubCategories() {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <SubcategoriesEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <DocumentSubCategoriesEdit editedItem={editedItem} handleClose={handleClose} open={open} />
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>

@@ -543,16 +543,16 @@ function Profile( handleClose, open, editedItem ) {
                         <form onSubmit={handleSubmit} className={classes.root}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <h5 className="card-title">About</h5>
+          <h2 className="card-title">About</h2>
           <p className="small fst-italic">
             Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.
           </p>
-          <h5 className="card-title">Profile Details</h5>
+          <h2 className="card-title">Profile Details</h2>
         </Grid>
         <Grid container spacing={1}>
-               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+            
+               <Grid item xs={12}>
                   <TextField
-                  fullWidth
                     type="text"
                     label="Full Name"
                     name="fullName"
@@ -561,9 +561,10 @@ function Profile( handleClose, open, editedItem ) {
                     value={formData.fullName}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                    style={{width:"100%"}}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item xs={12}>
                   <TextField
                     type="text"
                     label="Company Name"
@@ -573,9 +574,10 @@ function Profile( handleClose, open, editedItem ) {
                     value={formData.company}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                    style={{width:"100%"}}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item xs={12}>
                   <TextField
                     type="text"
                     label="Address"
@@ -585,11 +587,11 @@ function Profile( handleClose, open, editedItem ) {
                     value={formData.address}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                    style={{width:"100%"}}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item xs={12}>
                   <TextField
-                  fullWidth
                     type="text"
                     label="Mobile"
                     name="mobile"
@@ -598,9 +600,10 @@ function Profile( handleClose, open, editedItem ) {
                     value={formData.mobile}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                    style={{width:"100%"}}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item xs={12}>
                   <TextField
                     type="text"
                     label="Email"
@@ -610,10 +613,11 @@ function Profile( handleClose, open, editedItem ) {
                     value={formData.email}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
+                    style={{width:"100%"}}
                   />
                 </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField fullWidth
+                <Grid item xs={12}>
+            <TextField 
               type="file"
               name="image"
               label="Image"
@@ -621,6 +625,7 @@ function Profile( handleClose, open, editedItem ) {
               onChange={handleFileChange}
               validators={["required"]}
               errorMessages={["this field is required"]}
+              style={{width:"100%"}}
             />
           </Grid>
           <Button
@@ -672,19 +677,7 @@ function Profile( handleClose, open, editedItem ) {
                           <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
                           <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
                         </List>
-                        <Typography variant="h5" sx={{ mt: 4, fontWeight: 'bold' }}>
-                          Conferences, Courses & Workshops Attended
-                        </Typography>
-                        <Divider sx={{ margin: '16px 0' }} />
-                        <List sx={{ mt: 2 }}>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                        </List>
+                       
                     
                     </div>
                   </div>

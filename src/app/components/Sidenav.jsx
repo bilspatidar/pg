@@ -5,6 +5,7 @@ import { MatxVerticalNav } from 'app/components';
 import useSettings from 'app/hooks/useSettings';
 import { navigations } from 'app/navigations';
 import { navigations2 } from 'app/navigations2';
+import { navigations3 } from 'app/navigations3';
 import useAuth from 'app/hooks/useAuth';
 
 const StyledScrollBar = styled(Scrollbar)(() => ({
@@ -27,7 +28,7 @@ const SideNavMobile = styled('div')(({ theme }) => ({
 
 const Sidenav = ({ children }) => {
   const { settings, updateSettings } = useSettings();
-  const {  usertype } = useAuth();
+  const {  user_type } = useAuth();
 
   const updateSidebarMode = (sidebarSettings) => {
     let activeLayoutSettingsName = settings.activeLayout + 'Settings';
@@ -49,8 +50,9 @@ const Sidenav = ({ children }) => {
     <Fragment>
       <StyledScrollBar options={{ suppressScrollX: true }}>
         {children}
-        {usertype === 'superadmin' && <MatxVerticalNav items={navigations} />}
-        {usertype === 'admin' && <MatxVerticalNav items={navigations2} />}
+        {user_type === 'superadmin' && <MatxVerticalNav items={navigations} />}
+        {user_type === 'merchant' && <MatxVerticalNav items={navigations2} />}
+        {user_type === 'user' && <MatxVerticalNav items={navigations3} />}
       </StyledScrollBar>
 
       <SideNavMobile onClick={() => updateSidebarMode({ mode: 'close' })} />

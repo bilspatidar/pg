@@ -9,7 +9,7 @@ const initialState = {
   user: null,
   isInitialised: false,
   isAuthenticated: false,
-  usertype: 'superadmin'
+  user_type: 'superadmin'
 };
 
 const isValidToken = (accessToken) => {

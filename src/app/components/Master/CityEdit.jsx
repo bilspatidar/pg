@@ -23,39 +23,36 @@ const style = {
   p: 4,
 };
 
-function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
+function CityEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [documentcategories, setdocumentcategories] = useState([]);
-
+  const [States, setState] = useState([]);
   const [formData, setFormData] = useState({
-    document_category_id: '',
     name: '',
+    state_id:'',
     status: '',
-
   });
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
   // }
-
-  const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/document_category/document_category`;
+  const fetchState = async () => {
+    const endpoint = `${BASE_URL}/api/state/state`;
 
     try {
       const response = await fetch(endpoint, {
         method: "get",
         headers: new Headers({
-          //   "ngrok-skip-browser-warning": true,
+        //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),
+        }),  
       })
 
-      const { data } = await response.json();
-      setdocumentcategories(data);
+      const {data} = await response.json();
+      setState(data);
     } catch (error) {
       console.log(error)
     }
@@ -70,17 +67,16 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/document_subcategory/document_subcategory/update`;
+    const endpoint = `${BASE_URL}/api/city/city/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-        document_category_id: formData.document_category_id,
-        name: formData.name,
+       name: formData.name,
+       state_id: formData.state_id,
         status: formData.status,
-
 
       };
 
@@ -142,16 +138,13 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchState();
     console.log(editedItem)
     setFormData({
       id: editedItem.id,
       name: editedItem.name,
-      document_category_id: editedItem.document_category_id,
+      state_id: editedItem.state_id,
       status: editedItem.status,
-
-
-
     })
   }, [editedItem])
 
@@ -208,7 +201,8 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
               />
               <Grid container spacing={3}>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+
+                  <TextField fullWidth
                     type="text"
                     name="name"
                     label="Name"
@@ -216,34 +210,33 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
                     onChange={handleChange}
                     value={formData.name}
                     validators={["required"]}
-                    errorMessages={["this field is required"]}
+                    errorMessages={["This field is required"]}
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
-                    options={documentcategories}
-                    getOptionLabel={(document_category) => document_category.name}
-                    value={documentcategories.find((document_category) => document_category.id === formData.document_category_id) || null}
+                    options={States}
+                    getOptionLabel={(state) => state.name}
+                    value={States.find((state) => state.id === formData.state_id) || null}
                     onChange={(event, newValue) => {
-                      handleChange({
-                        target: {
-                          name: 'document_category_id',
-                          value: newValue ? newValue.id : '', // assuming id is a string or number
-                        },
-                      });
-                    }}
+                    handleChange({
+                    target: {
+                    name: 'state_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
                     renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Document Category Name"
-                        required
-                        fullWidth
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-
+                   <TextField
+                      {...params}
+                      label="State Name"
+                      required
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -277,4 +270,4 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default DocumentSubCategoriesEdit;
+export default CityEdit;

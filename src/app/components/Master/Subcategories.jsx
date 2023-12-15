@@ -16,6 +16,7 @@ import useAuth from 'app/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
+  Autocomplete,
   InputLabel,
   MenuItem,
   Grid,
@@ -382,24 +383,29 @@ function Subcategories() {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel>Category Name *</InputLabel>
-        <Select
-          name="category_id"
-          onChange={handleChange}
-          value={formData.category_id}
-          required
-        >
-          {/* Map over categories to generate MenuItem components */}
-          {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-
+                  <Autocomplete
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    onChange={(event, newValue) => {
+                    handleChange({
+                    target: {
+                    name: 'category_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
+                    renderInput={(params) => (
+                   <TextField
+                      {...params}
+                      label="Category Name"
+                      required
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>
 
 
               </Grid>

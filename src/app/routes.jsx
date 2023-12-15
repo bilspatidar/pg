@@ -11,7 +11,9 @@ import ManageCurrencies from './components/Master/ManageCurrencies';
 import DocumentTypes from './components/Master/DocumentType';
 import DocumentCategories from './components/Master/DocumentCategories';
 import DocumentSubCategories from './components/Master/DocumentSubCategories';
-
+import Countries from './components/Master/Countries';
+import State from './components/Master/State';
+import City from './components/Master/City';
 import Merchant from './components/ManageMerchant/Merchant';
 
 
@@ -59,7 +61,9 @@ const routes = [
       { path: '/master/DocumentTypes', element: <DocumentTypes /> },
       { path: '/master/DocumentCategories', element: <DocumentCategories /> },
       { path: '/master/DocumentSubCategories', element: <DocumentSubCategories /> },
-
+      { path: '/master/Countries', element: <Countries/> },
+      { path: '/master/state', element: <State/> },
+      { path: '/master/city', element: <City/> },
       { path: '/user/profile', element: <Profile /> },
       { path: '/user/Managepassword', element: <Managepassword /> },
 

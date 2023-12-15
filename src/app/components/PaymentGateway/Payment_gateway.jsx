@@ -28,8 +28,8 @@ import {
   TableRow,
   IconButton,
   FormControl,
+  Autocomplete,
   Select,
-
 
 } from "@mui/material";
 import { Span } from "app/components/Typography";
@@ -581,46 +581,61 @@ function Payment_gateway() {
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel>Currency</InputLabel>
-                    <Select
-                      name="currency"
-                      onChange={handleChange}
-                      value={formData.currency}
-                      multiple
+              
+                  <Autocomplete
+                    multiple
+                    options={currencys}
+                    getOptionLabel={(currency) => `${currency.currency_name}-${currency.currency_code}`}
+                    value={currencys.filter((currency) => formData.currency.includes(currency.currency_code))}
+                    onChange={(event, newValues) => {
+                    handleChange({
+                    target: {
+                    name: 'currency',
+                    value: newValues.map((newValue) => newValue.currency_code),
+                 },
+                });
+                }}
+                    renderInput={(params) => (
+                <TextField
+                   {...params}
+                   label="Currency"
+                   fullWidth
+                   size="small"
+                />
+                 )}
+                />
+                 </FormControl>
+             </Grid>
 
-                    >
-                      {/* Map over categories to generate MenuItem components */}
-                      {currencys.map((currency) => (
-                        <MenuItem key={currency.id} value={currency.currency_code}>
-                          {currency.currency_name}-{currency.currency_code}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                </Grid>
-
+               
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl fullWidth size="small">
-                    <InputLabel>Cards</InputLabel>
-                    <Select
-                      name="cards"
-                      onChange={handleChange}
-                      value={formData.cards}
-                      multiple
-
-                    >
-                      {/* Map over categories to generate MenuItem components */}
-                      {cardss.map((card) => (
-                        <MenuItem key={card.id} value={card.name}>
-                         
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                </Grid>
               
+                  <Autocomplete
+                    multiple
+                    options={cardss}
+                    getOptionLabel={(card) => `${card.name}`}
+                    value={cardss.filter((card) => formData.cards.includes(card.name))}
+                    onChange={(event, newValues) => {
+                    handleChange({
+                    target: {
+                    name: 'cards',
+                    value: newValues.map((newValue) => newValue.name),
+                 },
+                });
+                }}
+                    renderInput={(params) => (
+                <TextField
+                   {...params}
+                   label="Cards"
+                   fullWidth
+                   size="small"
+                />
+                 )}
+                />
+                 </FormControl>
+             </Grid>
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
