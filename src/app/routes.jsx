@@ -17,6 +17,8 @@ import City from './components/Master/City';
 import Merchant from './components/ManageMerchant/Merchant';
 import BlogCategory from './components/Manageweb/BlogCategory';
 import Blog from './components/Manageweb/Blog';
+import Services from './components/Manageweb/Services';
+
 
 
 
@@ -75,6 +77,8 @@ const routes = [
       { path: '/ManageMerchant/merchant', element: <Merchant /> },
       { path: '/Manageweb/BlogCategory', element: <BlogCategory /> },
       { path: '/Manageweb/Blog', element: <Blog /> },
+      { path: '/Manageweb/Services', element: <Services /> },
+
 
       
     ]
