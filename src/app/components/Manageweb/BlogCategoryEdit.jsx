@@ -10,7 +10,8 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
-import Autocomplete from '@mui/material/Autocomplete';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -23,43 +24,29 @@ const style = {
   p: 4,
 };
 
-function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
+function BlogCategoryEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [documentcategories, setdocumentcategories] = useState([]);
+  const [imageData, setImageData] = useState('');
 
   const [formData, setFormData] = useState({
-    document_category_id: '',
     name: '',
+    image: '',
     status: '',
-
   });
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
   // }
+   const handleFileChange = (e) => {
+     
+        
+    handleFileInputChange(e,setImageData);
 
-  const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/document_category/document_category`;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "get",
-        headers: new Headers({
-          //   "ngrok-skip-browser-warning": true,
-          "token": token
-        }),
-      })
-
-      const { data } = await response.json();
-      setdocumentcategories(data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -70,17 +57,16 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/document_subcategory/document_subcategory/update`;
+    const endpoint = `${BASE_URL}/api/blog_category/blog_category/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-        document_category_id: formData.document_category_id,
-        name: formData.name,
+       name: formData.name,
+       image:imageData, 
         status: formData.status,
-
 
       };
 
@@ -142,17 +128,18 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   };
 
   useEffect(() => {
-    fetchCategories();
     console.log(editedItem)
     setFormData({
       id: editedItem.id,
       name: editedItem.name,
-      document_category_id: editedItem.document_category_id,
+     
       status: editedItem.status,
 
 
 
-    })
+  
+})
+setImageData(editedItem.image)
   }, [editedItem])
 
 
@@ -208,7 +195,8 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
               />
               <Grid container spacing={3}>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+
+                  <TextField fullWidth
                     type="text"
                     name="name"
                     label="Name"
@@ -216,34 +204,21 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
                     onChange={handleChange}
                     value={formData.name}
                     validators={["required"]}
-                    errorMessages={["this field is required"]}
+                    errorMessages={["This field is required"]}
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <Autocomplete
-                    options={documentcategories}
-                    getOptionLabel={(document_category) => document_category.name}
-                    value={documentcategories.find((document_category) => document_category.id === formData.document_category_id) || null}
-                    onChange={(event, newValue) => {
-                      handleChange({
-                        target: {
-                          name: 'document_category_id',
-                          value: newValue ? newValue.id : '', // assuming id is a string or number
-                        },
-                      });
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Document Category Name"
-                        required
-                        fullWidth
-                        size="small"
-                      />
-                    )}
-                  />
-                </Grid>
-
+          <TextField
+              type="file"
+              name="image"
+              label="Image"
+              size="small"
+              onChange={handleFileChange}
+         
+              // validators={["required"]}
+              // errorMessages={["this field is required"]}
+            /> 
+          </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -277,4 +252,4 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default DocumentSubCategoriesEdit;
+export default BlogCategoryEdit;

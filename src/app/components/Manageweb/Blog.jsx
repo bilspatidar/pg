@@ -11,8 +11,9 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-
 import useAuth from 'app/hooks/useAuth';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -28,15 +29,16 @@ import {
   TableRow,
   IconButton,
   FormControl,
-  Autocomplete,
   Select,
+  Autocomplete,
+
 
 } from "@mui/material";
 import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import PaymentgatewayEdit from './PaymentgatewayEdit';
+import BlogEdit from './BlogEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -72,14 +74,16 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }));
 
-function Payment_gateway() {
+function Blog() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const { logout } = useAuth();
 
   const history = useNavigate();
-
+  
   const handlePrint = () => {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
@@ -100,74 +104,44 @@ function Payment_gateway() {
 
 
   const [formData, setFormData] = useState({
-    name: '',
-    short_name: '',
-    live_api: '',
-    live_secret: '',
-    test_api: '',
-    test_secret: '',
-    live_url: '',
-    test_url: '',
-    daily_limit: '',
-    minLimit: '',
-    maxLimit: '',
-    methodName: '',
-    currency: [],
-    cards: [],
-    blocked_country:'',
 
+            title: '',
+            category_id: '',
+            description: '',
+            image: '',
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [currencys, setCurrencys] = useState([]);
-  const [cardss, setcardss] = useState([
-   
-  ]);
+  const [imageData, setImageData] = useState('');
 
 
-  const fetchCurrency = async () => {
-    const endpoint = `${BASE_URL}/api/currency/currency`;
+
+
+  const handleFileChange = (e) => {
+    handleFileInputChange(e,setImageData);
+  };
+  const fetchCategories = async () => {
+    const endpoint = `${BASE_URL}/api/blog_category/blog_category`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "get",
         headers: new Headers({
-          // "ngrok-skip-browser-warning": true,
+        //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),
+        }),  
       })
 
-      const { data } = await response.json();
-      setCurrencys(data);
+      const {data} = await response.json();
+      setCategories(data);
     } catch (error) {
       console.log(error)
     }
   }
-  const fetchCard = async () => {
-    const endpoint = `${BASE_URL}/api/card/card`;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: new Headers({
-          // "ngrok-skip-browser-warning": true,
-          "token": token
-        }),
-      })
-
-      const { data } = await response.json();
-      setcardss(data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-
   //Get Data from API 
   async function geTableCellata() {
 
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/`;
+    const endpoint = `${BASE_URL}/api/blog/blog`;
 
     try {
       const res = await fetch(endpoint, {
@@ -180,13 +154,12 @@ function Payment_gateway() {
 
       const data = await res.json();
       setTableData(data.data);
-      console.log(data)
       if (res.status !== 401) {
         setTableData(data.data); // Set the fetched data to the local state variable
       }
       if(res.status === 401 && data.message === "Token Time Expire."){
         await logout();
-        history("session/signin")
+        history("/session/signin")
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -196,43 +169,26 @@ function Payment_gateway() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === "currency" || name === "cards") {
-      setFormData({
-        ...formData,
-        [name]: typeof value === 'string' ? value.split(',') : value,
-      })
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      })
-    }
+    setFormData({
+      ...formData,
+      [name]: value
+    })
   }
 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/add`;
+    const endpoint = `${BASE_URL}/api/blog/blog/add`;
     let em = [];
+
 
     try {
       const data = {
-        name: formData.name,
-        short_name: formData.short_name,
-        live_api: formData.live_api,
-        live_secret: formData.live_secret,
-        test_secret: formData.test_secret,
-        test_api: formData.test_api,
-        live_url: formData.live_url,
-        test_url: formData.test_url,
-        daily_limit: formData.daily_limit,
-        minLimit: formData.minLimit,
-        maxLimit: formData.maxLimit,
-        methodName: formData.methodName,
-        currency: formData.currency,
-        cards: formData .cards,
-        blocked_country:formData .blocked_country
+        title: formData.title,
+        category_id: formData.category_id,
+        description: formData.description,
+        image: imageData,
       };
 
       const res = await fetch(endpoint, {
@@ -253,21 +209,10 @@ function Payment_gateway() {
         console.log(responseData.message)
         setFormData(
           {
-            name: '',
-            short_name: '',
-            live_api: '',
-            live_secret: '',
-            test_api: '',
-            test_secret: '',
-            live_url: '',
-            test_url: '',
-            daily_limit: '',
-            minLimit: '',
-            maxLimit: '',
-            methodName: '',
-            currency: [],
-            cards: [],
-            blocked_country:'',
+            title: '',
+            category_id: '',
+            description: '',
+            image: '',
           }
         )
         let obj = { bgType: "success", message: `${responseData.message}` };
@@ -315,8 +260,7 @@ function Payment_gateway() {
 
   useEffect(() => {
     geTableCellata();
-    fetchCurrency();
-    fetchCard();
+    fetchCategories();
   }, []);
 
   const [page, setPage] = useState(0);
@@ -357,7 +301,7 @@ function Payment_gateway() {
 
   const deleteItem = async () => {
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/blog/blog/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -402,7 +346,7 @@ function Payment_gateway() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Payment Gateway', path: '/PaymentGateway/Payment_gateway ' },
+          <Breadcrumb routeSegments={[{ name: 'Blog ', path: '/Manageweb/Blog ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -424,233 +368,71 @@ function Payment_gateway() {
           ))
         }
 
-
         <Stack spacing={3}>
-          <SimpleCard title="Payment Gateway Form">
-
-
+          <SimpleCard title="Blog Form">
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="name"
-                    label="Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.name}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="short_name"
-                    label="short Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.short_name}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="live_api"
-                    label="Live Api"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.live_api}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="live_secret"
-                    label="Live Secret"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.live_secret}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="test_api"
-                    label="Test Api"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.test_api}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="test_secret"
-                    label="Test_Secret"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.test_secret}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="live_url"
-                    label="Live Url"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.live_url}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="test_url"
-                    label="Test Url"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.test_url}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="daily_limit"
-                    label="Daily Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.daily_limit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="minLimit"
-                    label="Min Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.minLimit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="number"
-                    name="maxLimit"
-                    label="Max Limit"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.maxLimit}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="methodName"
-                    label="Method Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.methodName}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-              
+              <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
-                    multiple
-                    options={currencys}
-                    getOptionLabel={(currency) => `${currency.currency_name}-${currency.currency_code}`}
-                    value={currencys.filter((currency) => formData.currency.includes(currency.currency_code))}
-                    onChange={(event, newValues) => {
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    onChange={(event, newValue) => {
                     handleChange({
                     target: {
-                    name: 'currency',
-                    value: newValues.map((newValue) => newValue.currency_code),
+                    name: 'category_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
                  },
-                });
-                }}
+                   });
+                      }}
                     renderInput={(params) => (
-                <TextField
-                   {...params}
-                   label="Currency"
-                   fullWidth
-                   size="small"
-                />
+                   <TextField
+                      {...params}
+                      label="Category Name"
+                      required
+                     fullWidth
+                     size="small"
+                            />
                  )}
-                />
-                 </FormControl>
-             </Grid>
-
-               
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-              
-                  <Autocomplete
-                    multiple
-                    options={cardss}
-                    getOptionLabel={(card) => `${card.name}`}
-                    value={cardss.filter((card) => formData.cards.includes(card.name))}
-                    onChange={(event, newValues) => {
-                    handleChange({
-                    target: {
-                    name: 'cards',
-                    value: newValues.map((newValue) => newValue.name),
-                 },
-                });
-                }}
-                    renderInput={(params) => (
-                <TextField
-                   {...params}
-                   label="Cards"
-                   fullWidth
-                   size="small"
-                />
-                 )}
-                />
-                 </FormControl>
-             </Grid>
-
+                   />
+            </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="blocked_country"
-                    label="Blocked Country"
+                    name="title"
+                    label="Title"
                     size="small"
                     onChange={handleChange}
-                    value={formData.blocked_country}
+                    value={formData.title}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
-
-
-
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                    
+          <TextField
+              type="file"
+              name="image"
+              label="Image"
+              size="small"
+              onChange={handleFileChange}
+         
+              // validators={["required"]}
+              // errorMessages={["this field is required"]}
+            /> 
+          </Grid>
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="description"
+                    label="Description"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.description}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
               </Grid>
 
               <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
@@ -664,7 +446,7 @@ function Payment_gateway() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Payment Gateway Table">
+        <SimpleCard title="Blog Table">
           <ValidatorForm className="filterForm">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
@@ -733,10 +515,9 @@ function Payment_gateway() {
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center"> Name</TableCell>
-                  <TableCell align="center">Daily Limit  </TableCell>
-                  <TableCell align="center">Min Limit</TableCell>
-                  <TableCell align="center">Max Limit </TableCell>
+                  <TableCell align="center"> Title</TableCell>
+                  <TableCell align="center">Blog Category</TableCell>
+                  <TableCell align="center">Image </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
 
@@ -748,10 +529,22 @@ function Payment_gateway() {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.name}</TableCell>
-                      <TableCell align="center">{item.daily_limit}</TableCell>
-                      <TableCell align="center">{item.minLimit}</TableCell>
-                      <TableCell align="center">{item.maxLimit}</TableCell>
+                      <TableCell align="center">{item.title}</TableCell>
+                      <TableCell align="center">{item.category_id}</TableCell>
+                      <TableCell align="center">
+        {item.image ? (
+          <a href={item.image} target="_blank" rel="noopener noreferrer">
+            <img
+              style={{ height: '50px', width: '50px' }}
+              src={item.image}
+              alt="Item Image"
+            />
+          </a>
+        ) : (
+          <span>No Image Available</span>
+        )}
+      </TableCell>
+            
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -766,7 +559,7 @@ function Payment_gateway() {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <PaymentgatewayEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <BlogEdit editedItem={editedItem} handleClose={handleClose} open={open} />
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -813,4 +606,4 @@ function Payment_gateway() {
   )
 }
 
-export default Payment_gateway;
+export default Blog;

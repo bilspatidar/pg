@@ -314,7 +314,7 @@ function DocumentCategories() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'DocumentCategories', path: '/master/documentcategories ' },
+          <Breadcrumb routeSegments={[{ name: 'Document Categories', path: '/master/documentcategories ' },
           { name: 'Form' }]} />
         </Box>
         {

@@ -1,5 +1,5 @@
 export const navigations2 = [
-  { name: ' ADMIN Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+  { name: ' Merchant Dashboard', path: '/dashboard/default', icon: 'dashboard' },
   // {
   //   name: 'Session/Auth',
   //   icon: 'security',

@@ -10,7 +10,7 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
-
+import Autocomplete from '@mui/material/Autocomplete';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -220,24 +220,29 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl fullWidth size="small">
-        <InputLabel>Category Name *</InputLabel>
-        <Select
-          name="category_id"
-          onChange={handleChange}
-          value={formData.category_id}
-          required
-        >
-          {/* Map over categories to generate MenuItem components */}
-          {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    </Grid>
-
+                  <Autocomplete
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    onChange={(event, newValue) => {
+                    handleChange({
+                    target: {
+                    name: 'category_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
+                    renderInput={(params) => (
+                   <TextField
+                      {...params}
+                      label="Category Name"
+                      required
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -253,7 +258,7 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Button disabled={loading}
+              <Button 
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"

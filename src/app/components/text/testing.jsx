@@ -12,8 +12,6 @@ import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
-import Chip from '@mui/material/Chip';
-
 
 import {
   Button,
@@ -37,7 +35,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import SubCategoryEdit from './SubCategoryEdit';
+import CategoryEdit from './CategoryEdit';
 
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
@@ -73,7 +71,7 @@ const Small = styled('small')(({ bgcolor }) => ({
     },
   }));
 
-function SubCategory () {
+function Category () {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
@@ -99,43 +97,22 @@ function SubCategory () {
 
 
     const [formData, setFormData] = useState({
-      category_id: '',
       name: '',
-      image: '',
-      status: '',
+      status: '',      
+      image:'',
       });
-
-      const [categories, setCategories] = useState([]);
-
     const [tableData, setTableData] = useState([]);
     const [loading, setLoading] = useState(true);
     
     const [imageData, setImageData] = useState('');
 
-    const fetchCategories = async () => {
-      const endpoint = ${BASE_URL}/category/index;
-
-      try {
-        const response = await fetch(endpoint, {
-          method: "get",
-          headers: new Headers({
-            "ngrok-skip-browser-warning": true,
-            "token": token
-          }),  
-        })
-
-        const {data} = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.log(error)
-      }
-    }
+    
     
       
       //Get Data from API 
       async function geTableCellata() {
         
-        const endpoint = ${BASE_URL}/sub_category/index;
+        const endpoint = ${BASE_URL}/category/index;
     
         try {
           const res = await fetch(endpoint,{
@@ -147,9 +124,8 @@ function SubCategory () {
           });
           
          const data = await res.json();
-          setTableData(data);
+          setTableData(data.data);
           if(res.status !== 401){
-            console.log(data)
             setTableData(data.data); // Set the fetched data to the local state variable
           }
         
@@ -159,9 +135,6 @@ function SubCategory () {
         setLoading(false);
       }
     
-
-
-      
       const handleChange = (e) => {
         // file type m value nhi hoti h wait sochne do conditon lgegi yha
         const {name, value} = e.target;
@@ -175,16 +148,15 @@ function SubCategory () {
       const handleSubmit = async (e) => {
         e.preventDefault();
          setLoading(true);
-        const endpoint = ${BASE_URL}/sub_category/create;
+        const endpoint = ${BASE_URL}/category/create;
        let em = [];
        
        
         try {
           const data = {
-            category_id: formData.category_id,
             name: formData.name,
-            image:imageData, 
-            status:formData.status,
+            status: formData.status,
+            image: imageData,
           };
       
           const res = await fetch(endpoint, {
@@ -205,7 +177,6 @@ function SubCategory () {
             console.log(responseData.message)
             setFormData(
               {
-                category_id:'',
                 name: '',
                 status: '',
                 image: '',
@@ -261,7 +232,6 @@ function SubCategory () {
 
       useEffect(() => {
         geTableCellata();
-        fetchCategories();
      }, []);
 
     const [page, setPage] = useState(0);
@@ -276,6 +246,7 @@ function SubCategory () {
       setPage(0);
     };
 
+  
     const handleOpen = (item) => {
       setEditedItem(item)
       setOpen(true);
@@ -303,7 +274,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   const deleteItem = async () => {
     const token = localStorage.getItem('accessToken');
 
-    const endpoint = ${BASE_URL}/sub_category/destroy;
+    const endpoint = ${BASE_URL}/category/destroy;
     try {
       const data = {
         id: deletedItemId,
@@ -335,7 +306,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
      <div className='componentLoader'>  { loading? ( <Loading /> ) : ( "" ) } </div>
         <Container>
         <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Sub Category', path: '/master/subcategory' }, { name: 'Form' }]} />
+        <Breadcrumb routeSegments={[{ name: 'Category', path: '/master/category' }, { name: 'Form' }]} />
       </Box>
       {
         errorMsg && errorMsg.length > 0 && errorMsg.map((error, index)=>(
@@ -357,112 +328,57 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
       }
       
       <Stack spacing={3}>
-        <SimpleCard title="Sub Category Form">
+        <SimpleCard title="Category Form">
 
 
-        <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-
-    <Grid container spacing={3}>
-  
-<Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      {/* <FormControl fullWidth size="small">
-        <InputLabel>Category Name *</InputLabel>
+    <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
+        <Grid container spacing={3}>
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+            <TextField
+              type="text"
+              name="name"
+              label="Name"
+              size="small"
+              onChange={handleChange}
+              value={formData.name} 
+              validators={["required"]}
+              errorMessages={["this field is required"]}
+            /> 
+          </Grid>
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+          <TextField
+              type="file"
+              name="image"
+              label="Image"
+              size="small"
+              onChange={handleFileChange}
+         
+              // validators={["required"]}
+              // errorMessages={["this field is required"]}
+            /> 
+          </Grid>
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+      <FormControl size="small" fullWidth>
+        <InputLabel>Status</InputLabel>
         <Select
-          name="category_id"
+          name="status"
           onChange={handleChange}
-          value={formData.category_id}
+          value={formData.status}
           required
         >
-          {/* Map over categories to generate MenuItem components */}
-          {/* {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select> */}
-      {/* </FormControl> */} 
-
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-chip-label"> Category </InputLabel>
-        <Select
-          labelId="category_id-label"
-          id="demo-multiple-chip"
-          multiple
-          value={personName}
-          onChange={handleChange}
-          input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-          renderValue={(selected) => (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
-          MenuProps={MenuProps}
-        >
-          {names.map((name) => (
-            <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
-            >
-              {name}
-            </MenuItem>
-          ))}
+          <MenuItem value="active">Active</MenuItem> 
+          <MenuItem value="deactive">Deactive</MenuItem> 
         </Select>
       </FormControl>
-
     </Grid>
 
+        </Grid>
 
-
-
-  <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-    <TextField
-      type="text"
-      name="name"
-      label="Name"
-      size="small"
-      onChange={handleChange}
-      value={formData.name} 
-      validators={["required"]}
-      errorMessages={["this field is required"]}
-    /> 
-  </Grid>
-  <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-  <TextField
-      type="file"
-      name="image"
-      
-      label="Image"
-      size="small"
-      onChange={handleFileChange}
-    
-      
-    /> 
-  </Grid>
-  <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl size="small" fullWidth>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      name="status"
-                      onChange={handleChange}
-                      value={formData.status}
-                    >
-                      <MenuItem value="active">Active</MenuItem>
-                      <MenuItem value="deactive">Deactive</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
- 
-
-</Grid>
-
-<Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
-  <Icon>send</Icon>
-  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-</Button>
-</ValidatorForm>
+        <Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
+          <Icon>send</Icon>
+          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
+        </Button>
+      </ValidatorForm>
 
       </SimpleCard>
       </Stack>
@@ -470,7 +386,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
 
 
       <Container>
-      <SimpleCard title="Sub Category Table">
+      <SimpleCard title="Category Table">
       <ValidatorForm  className="filterForm">
       <Grid container spacing={2}>
         <Grid item xs={12} md={3}>
@@ -538,11 +454,10 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
     
        <TableRow>
          <TableCell align="left">Sr no.</TableCell>
-         <TableCell align="center">Category Name</TableCell>
-            <TableCell align="center">Name</TableCell>
-            <TableCell align="center">Image</TableCell>
-            <TableCell align="center">Status</TableCell>
-            <TableCell align="right">Option</TableCell>
+         <TableCell align="center">Name</TableCell>
+         <TableCell align="center">image</TableCell>
+         <TableCell align="center">Status</TableCell>
+         <TableCell align="right">Option</TableCell>
          
        </TableRow>
      </TableHead>
@@ -552,8 +467,6 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
          .map((item, index) => (
            <TableRow key={index}>
              <TableCell align="left">{index + 1}</TableCell>
-             <TableCell align="center">{item.category_name}</TableCell>
-             
              <TableCell align="center">{item.name}</TableCell>
              <TableCell align="center">
         {item.image ? (
@@ -582,7 +495,7 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
              onClick={() => handleOpen(item)}>
 <Icon>edit</Icon>
 </ModeTwoToneIcon>
-           <SubCategoryEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+           <CategoryEdit editedItem={editedItem} handleClose={handleClose} open={open} />
            <DeleteOutlineTwoToneIcon onClick={()=>handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
 <Icon>delete</Icon>
 </DeleteOutlineTwoToneIcon>
@@ -629,4 +542,4 @@ const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
   )
 }
 
-export default SubCategory;
+export default Category;

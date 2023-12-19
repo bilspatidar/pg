@@ -25,7 +25,9 @@ export const navigations = [
       // { name: 'Document Types', path: '/master/documenttypes', iconText: 'T' },
       { name: 'Document Categories', path: '/master/documentcategories', iconText: 'T' },
       { name: 'Document Sub Categories', path: '/master/DocumentSubCategories', iconText: 'T' },
-
+      { name: 'Countries', path: '/master/countries', iconText: 'T' },
+      { name: 'State', path: '/master/state', iconText: 'T' },
+      { name: 'City', path: '/master/city', iconText: 'T' },
     ]
   },
  
@@ -38,6 +40,21 @@ export const navigations = [
 
 
       { name: 'Payment Gateway', path: '/PaymentGateway/Payment_gateway', iconText: 'T' },
+    
+
+    ]
+  },
+  {
+    name: 'Manage Web',
+    icon: 'settings',
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Blog Category', path: '/Manageweb/BlogCategory', iconText: 'T' },
+      { name: 'Blog', path: '/Manageweb/Blog', iconText: 'T' },
+      { name: 'Services', path: '/Manageweb/Services', iconText: 'T' },
     
 
     ]

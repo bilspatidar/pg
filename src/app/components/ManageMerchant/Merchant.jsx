@@ -27,15 +27,14 @@ import {
   TableRow,
   IconButton,
   FormControl,
+  Autocomplete,
   Select,
-
-
 } from "@mui/material";
 import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-// import MerchantEdit from './MerchantEdit';
+import MerchantEdit from './MerchantEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -100,10 +99,13 @@ function Merchant() {
   const history = useNavigate();
   const [categories, setCategories] = useState([]);
   const [Countries, setCountries] = useState([]);
+
   const [cities, setcities] = useState([]);
-  const [businesstypes, setbusinesstypes] = useState([]);
+  const [businesstypes, setBusinesstypes] = useState([]);
+
   const [subcategories, setsubcategories] = useState([]);
-  const [states, setstates] = useState([]);
+  const [States, setState] = useState([]);
+
 
 
 
@@ -133,15 +135,66 @@ function Merchant() {
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const fetchCity = async () => {
+    const endpoint = `${BASE_URL}/api/city/parent_city/${formData.state_id}`;
 
-  const [currencys, setCurrencys] = useState([]);
-  const [cardss, setcardss] = useState([
+    try {
+      const response = await fetch(endpoint, {
+        method: "get",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
 
-  ]);
+      const { data } = await response.json();
+      setcities(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const fetchState = async () => {
+    console.log(formData.country_id)
+    const endpoint = `${BASE_URL}/api/state/parent_state/${formData.country_id}`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "get",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setState(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const fetchCountries = async () => {
+    const endpoint = `${BASE_URL}/api/country/country`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "get",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setCountries(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
-  const fetchCurrency = async () => {
-    const endpoint = `${BASE_URL}/api/currency/currency`;
+
+  const fetchBusinesstype = async () => {
+    const endpoint = `${BASE_URL}/api/business_type/business_type`;
 
     try {
       const response = await fetch(endpoint, {
@@ -153,13 +206,13 @@ function Merchant() {
       })
 
       const { data } = await response.json();
-      setCurrencys(data);
+      setBusinesstypes(data);
     } catch (error) {
       console.log(error)
     }
   }
-  const fetchCard = async () => {
-    const endpoint = `${BASE_URL}/api/card/card`;
+  const fatchsubcategories = async () => {
+    const endpoint = `${BASE_URL}/api/sub_category/sub_category`;
 
     try {
       const response = await fetch(endpoint, {
@@ -171,17 +224,34 @@ function Merchant() {
       })
 
       const { data } = await response.json();
-      setcardss(data);
+      setsubcategories(data);
     } catch (error) {
       console.log(error)
     }
   }
+  const fatchcategories = async () => {
+    const endpoint = `${BASE_URL}/api/category/category`;
 
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: new Headers({
+          // "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setCategories(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   //Get Data from API 
   async function geTableCellata() {
 
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/`;
+    const endpoint = `${BASE_URL}/api/user/merchant_list`;
 
     try {
       const res = await fetch(endpoint, {
@@ -198,7 +268,7 @@ function Merchant() {
       if (res.status !== 401) {
         setTableData(data.data); // Set the fetched data to the local state variable
       }
-      if(res.status === 401 && data.message === "Token Time Expire."){
+      if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
         history("session/signin")
       }
@@ -227,7 +297,7 @@ function Merchant() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/add`;
+    const endpoint = `${BASE_URL}/api/user/merchant/add`;
     let em = [];
 
     try {
@@ -335,9 +405,20 @@ function Merchant() {
 
   useEffect(() => {
     geTableCellata();
-    fetchCurrency();
-    fetchCard();
+    fetchBusinesstype();
+    fatchsubcategories();
+    fatchcategories();
+    fetchCountries();
   }, []);
+
+  useEffect(() => {
+    fetchState();
+  }, [formData.country_id])
+
+  useEffect(() => {
+    fetchCity();
+  }, [formData.state_id])
+
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -376,8 +457,9 @@ function Merchant() {
   };
 
   const deleteItem = async () => {
+    console.log()
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/user/merchant/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -526,125 +608,152 @@ function Merchant() {
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Country*</InputLabel>
-                    <Select
-                      name="category_id"
-                      onChange={handleChange}
-                      value={formData.country_id}
-                      required
-                    >
-
-                      {Countries.map((country) => (
-                        <MenuItem key={country.id} value={country.id}>
-                          {country.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    options={Countries}
+                    getOptionLabel={(country) => country.name}
+                    value={Countries.find((country) => country.id === formData.country_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'country_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Country Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
                 </Grid>
-
-
-
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>State Name *</InputLabel>
-                    <Select
-                      name="state_id"
-                      onChange={handleChange}
-                      value={formData.state_id}
-                      required
-                    >
-
-                      {states.map((state) => (
-                        <MenuItem key={state.id} value={state.name}>
-                          {state.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>City Name *</InputLabel>
-                    <Select
-                      name="category_id"
-                      onChange={handleChange}
-                      value={formData.city_id}
-                      required
-                    >
-
-                      {cities.map((city) => (
-                        <MenuItem key={city.id} value={city.id}>
-                          {city.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Business Type *</InputLabel>
-                    <Select
-                      name="business_type_id"
-                      onChange={handleChange}
-                      value={formData.business_type_id}
-                      required
-                    >
-
-                      {businesstypes.map((businesstype) => (
-                        <MenuItem key={businesstype.id} value={businesstype.id}>
-                          {businesstype.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    options={States}
+                    getOptionLabel={(state) => state.name}
+                    value={States.find((state) => state.id === formData.state_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'state_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="State Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Category Name *</InputLabel>
-                    <Select
-                      name="business_category_id"
-                      onChange={handleChange}
-                      value={formData.business_category_id}
-                      required
-                    >
-
-                      {categories.map((category) => (
-                        <MenuItem key={category.id} value={category.id}>
-                          {category.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    options={cities}
+                    getOptionLabel={(city) => city.name}
+                    value={cities.find((city) => city.id === formData.city_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'city_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="City Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
                 </Grid>
-
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl fullWidth size="small">
-                    <InputLabel>Sub Category *</InputLabel>
-                    <Select
-                      name="business_subcategory_id"
-                      onChange={handleChange}
-                      value={formData.business_subcategory_id}
-                      required
-                    >
-
-                      {subcategories.map((subcategory) => (
-                        <MenuItem key={subcategory.id} value={subcategory.name}>
-                          {subcategory.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+                  <Autocomplete
+                    options={businesstypes}
+                    getOptionLabel={(businesstype) => businesstype.name}
+                    value={businesstypes.find((businesstype) => businesstype.id === formData.business_type_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'business_type_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Business Type"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <Autocomplete
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === formData.business_category_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'business_category_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Category Name *"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
                 </Grid>
 
-
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <Autocomplete
+                    options={subcategories}
+                    getOptionLabel={(subcategory) => subcategory.name}
+                    value={subcategories.find((subcategory) => subcategory.id === formData.business_subcategory_id) || null}
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'business_subcategory_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Sub Category"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
@@ -672,7 +781,19 @@ function Merchant() {
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
-                    type="text"
+                    type="mobile"
+                    name="mobile"
+                    label="Mobile "
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.mobile}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="date"
                     name="business_registered"
                     label="Business Registered"
                     size="small"
@@ -793,9 +914,10 @@ function Merchant() {
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
                   <TableCell align="center"> Name</TableCell>
-                  <TableCell align="center">Daily Limit  </TableCell>
-                  <TableCell align="center">Min Limit</TableCell>
-                  <TableCell align="center">Max Limit </TableCell>
+                  <TableCell align="center">users_id  </TableCell>
+                  <TableCell align="center">Email</TableCell>
+                  <TableCell align="center">Mobile </TableCell>
+                  <TableCell align="center">User Type </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
 
@@ -808,9 +930,10 @@ function Merchant() {
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
                       <TableCell align="center">{item.name}</TableCell>
-                      <TableCell align="center">{item.daily_limit}</TableCell>
-                      <TableCell align="center">{item.minLimit}</TableCell>
-                      <TableCell align="center">{item.maxLimit}</TableCell>
+                      <TableCell align="center">{item.users_id}</TableCell>
+                      <TableCell align="center">{item.email}</TableCell>
+                      <TableCell align="center">{item.mobile}</TableCell>
+                      <TableCell align="center">{item.user_type}</TableCell>
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -825,8 +948,8 @@ function Merchant() {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        {/* <MerchantEdit editedItem={editedItem} handleClose={handleClose} open={open} /> */}
-                        <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
+                        <MerchantEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.users_id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
                         <Dialog actionButtonhandler={deleteItem} open={openDeleteModal} handleClose={handleDeleteModalClose} />
