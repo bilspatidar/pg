@@ -28,7 +28,7 @@ const SideNavMobile = styled('div')(({ theme }) => ({
 
 const Sidenav = ({ children }) => {
   const { settings, updateSettings } = useSettings();
-  const {  user_type } = useAuth();
+  const { user_type } = useAuth();
 
   const updateSidebarMode = (sidebarSettings) => {
     let activeLayoutSettingsName = settings.activeLayout + 'Settings';
@@ -45,7 +45,7 @@ const Sidenav = ({ children }) => {
       }
     });
   };
-  
+
   return (
     <Fragment>
       <StyledScrollBar options={{ suppressScrollX: true }}>

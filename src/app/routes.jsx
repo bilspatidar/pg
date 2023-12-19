@@ -15,6 +15,9 @@ import Countries from './components/Master/Countries';
 import State from './components/Master/State';
 import City from './components/Master/City';
 import Merchant from './components/ManageMerchant/Merchant';
+import BlogCategory from './components/Manageweb/BlogCategory';
+import Blog from './components/Manageweb/Blog';
+
 
 
 import Profile from './components/user/Profile';
@@ -70,7 +73,10 @@ const routes = [
       { path: '/PaymentGateway/Payment_gateway', element: <Payment_gateway /> },
 
       { path: '/ManageMerchant/merchant', element: <Merchant /> },
+      { path: '/Manageweb/BlogCategory', element: <BlogCategory /> },
+      { path: '/Manageweb/Blog', element: <Blog /> },
 
+      
     ]
   },
 

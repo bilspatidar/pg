@@ -45,6 +45,20 @@ export const navigations = [
     ]
   },
   {
+    name: 'Manage Web',
+    icon: 'settings',
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Blog Category', path: '/Manageweb/BlogCategory', iconText: 'T' },
+      { name: 'Blog', path: '/Manageweb/Blog', iconText: 'T' },
+    
+
+    ]
+  },
+  {
     name: 'Manage Merchant',
     icon: 'settings',
 

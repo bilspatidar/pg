@@ -136,36 +136,37 @@ function Merchant() {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const fetchCity = async () => {
-    const endpoint = `${BASE_URL}/api/city/city`;
+    const endpoint = `${BASE_URL}/api/city/parent_city/${formData.state_id}`;
 
     try {
       const response = await fetch(endpoint, {
         method: "get",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
+          //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),  
+        }),
       })
 
-      const {data} = await response.json();
+      const { data } = await response.json();
       setcities(data);
     } catch (error) {
       console.log(error)
     }
   }
   const fetchState = async () => {
-    const endpoint = `${BASE_URL}/api/state/state`;
+    console.log(formData.country_id)
+    const endpoint = `${BASE_URL}/api/state/parent_state/${formData.country_id}`;
 
     try {
       const response = await fetch(endpoint, {
         method: "get",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
+          //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),  
+        }),
       })
 
-      const {data} = await response.json();
+      const { data } = await response.json();
       setState(data);
     } catch (error) {
       console.log(error)
@@ -178,12 +179,12 @@ function Merchant() {
       const response = await fetch(endpoint, {
         method: "get",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
+          //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),  
+        }),
       })
 
-      const {data} = await response.json();
+      const { data } = await response.json();
       setCountries(data);
     } catch (error) {
       console.log(error)
@@ -408,9 +409,16 @@ function Merchant() {
     fatchsubcategories();
     fatchcategories();
     fetchCountries();
-    fetchState();
-    fetchCity();
   }, []);
+
+  useEffect(() => {
+    fetchState();
+  }, [formData.country_id])
+
+  useEffect(() => {
+    fetchCity();
+  }, [formData.state_id])
+
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -449,8 +457,9 @@ function Merchant() {
   };
 
   const deleteItem = async () => {
+    console.log()
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/user/merchant/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -604,122 +613,122 @@ function Merchant() {
                     getOptionLabel={(country) => country.name}
                     value={Countries.find((country) => country.id === formData.country_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'country_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'country_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Country Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-               </Grid>
-               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                      <TextField
+                        {...params}
+                        label="Country Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
                     options={States}
                     getOptionLabel={(state) => state.name}
                     value={States.find((state) => state.id === formData.state_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'state_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'state_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="State Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-              </Grid>
-        
+                      <TextField
+                        {...params}
+                        label="State Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
                     options={cities}
                     getOptionLabel={(city) => city.name}
                     value={cities.find((city) => city.id === formData.city_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'city_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'city_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="City Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
+                      <TextField
+                        {...params}
+                        label="City Name"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
                 </Grid>
-   
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
                     options={businesstypes}
                     getOptionLabel={(businesstype) => businesstype.name}
                     value={businesstypes.find((businesstype) => businesstype.id === formData.business_type_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'business_type_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'business_type_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Business Type"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-               </Grid>
+                      <TextField
+                        {...params}
+                        label="Business Type"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
                     options={categories}
                     getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    value={categories.find((category) => category.id === formData.business_category_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'category_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'business_category_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Category Name *"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
+                      <TextField
+                        {...params}
+                        label="Category Name *"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
@@ -727,24 +736,24 @@ function Merchant() {
                     getOptionLabel={(subcategory) => subcategory.name}
                     value={subcategories.find((subcategory) => subcategory.id === formData.business_subcategory_id) || null}
                     onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'business_subcategory_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
+                      handleChange({
+                        target: {
+                          name: 'business_subcategory_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
                     renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Sub Category"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
+                      <TextField
+                        {...params}
+                        label="Sub Category"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
@@ -940,7 +949,7 @@ function Merchant() {
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
                         <MerchantEdit editedItem={editedItem} handleClose={handleClose} open={open} />
-                        <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
+                        <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.users_id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
                         <Dialog actionButtonhandler={deleteItem} open={openDeleteModal} handleClose={handleDeleteModalClose} />

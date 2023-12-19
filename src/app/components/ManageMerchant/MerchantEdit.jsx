@@ -68,7 +68,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
   // }
 
   const fetchCity = async () => {
-    const endpoint = `${BASE_URL}/api/city/city`;
+    const endpoint = `${BASE_URL}/api/city/parent_city/${formData.state_id}`;
 
     try {
       const response = await fetch(endpoint, {
@@ -86,7 +86,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     }
   }
   const fetchState = async () => {
-    const endpoint = `${BASE_URL}/api/state/state`;
+    const endpoint = `${BASE_URL}/api/state/parent_state/${formData.country_id}`;
 
     try {
       const response = await fetch(endpoint, {
@@ -279,8 +279,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     fatchsubcategories();
     fatchcategories();
     fetchCountries();
-    fetchState();
-    fetchCity();
+   
 
     console.log(editedItem)
     setFormData({
@@ -309,6 +308,13 @@ function MerchantEdit({ handleClose, open, editedItem }) {
 
     })
   }, [editedItem])
+  useEffect(() => {
+    fetchState();
+  }, [formData.country_id])
+
+  useEffect(() => {
+    fetchCity();
+  }, [formData.state_id])
 
 
   return (
@@ -538,11 +544,11 @@ function MerchantEdit({ handleClose, open, editedItem }) {
                   <Autocomplete
                     options={categories}
                     getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    value={categories.find((category) => category.id === formData.business_category_id) || null}
                     onChange={(event, newValue) => {
                     handleChange({
                     target: {
-                    name: 'category_id',
+                    name: 'business_category_id',
                     value: newValue ? newValue.id : '', // assuming id is a string or number
                  },
                    });
@@ -550,7 +556,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
                     renderInput={(params) => (
                    <TextField
                       {...params}
-                      label="Category Name *"
+                      label="Category Name "
                       required
                      fullWidth
                      size="small"

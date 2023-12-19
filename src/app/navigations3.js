@@ -1,5 +1,5 @@
 export const navigations3 = [
-    { name: 'Super admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+    { name: 'User admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
     // {
     //   name: 'Session/Auth',
     //   icon: 'security',

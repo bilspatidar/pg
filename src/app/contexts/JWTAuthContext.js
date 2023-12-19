@@ -9,7 +9,7 @@ const initialState = {
   user: null,
   isInitialised: false,
   isAuthenticated: false,
-  user_type: 'superadmin'
+  user_type: null
 };
 
 const isValidToken = (accessToken) => {
@@ -33,18 +33,18 @@ const setSession = (accessToken) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'INIT': {
-      const { isAuthenticated, user } = action.payload;
-      return { ...state, isAuthenticated, isInitialised: true, user };
+      const { isAuthenticated, user, user_type } = action.payload;
+      return { ...state, isAuthenticated, isInitialised: true, user_type };
     }
 
     case 'LOGIN': {
-      const { user } = action.payload;
+      const { user, user_type } = action.payload;
       console.log(user);
-      return { ...state, isAuthenticated: true, user };
+      return { ...state, isAuthenticated: true, user, user_type };
     }
 
     case 'LOGOUT': {
-      return { ...state, isAuthenticated: false, user: null };
+      return { ...state, isAuthenticated: false, user: null, user_type: null };
     }
 
     case 'REGISTER': {
@@ -75,39 +75,40 @@ export const AuthProvider = ({ children }) => {
 
   //   dispatch({ type: 'LOGIN', payload: { user } });
   // };
- const login = async (email, password) => {
-  try {
-    const response = await fetch(`${BASE_URL}api/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password }) // Shorthand for { email: email, password: password }
-    });
+  const login = async (email, password) => {
+    try {
+      const response = await fetch(`${BASE_URL}api/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password }) // Shorthand for { email: email, password: password }
+      });
 
-    if (!response.ok) {
-      throw new Error('Login failed'); // Handle non-200 response
+      if (!response.ok) {
+        throw new Error('Login failed'); // Handle non-200 response
+      }
+
+      const data = await response.json();
+      const token = data.access_token; // Access the token directly from data
+
+      console.log('data after login:', token);
+      // user_type
+      localStorage.setItem('accessToken', token);
+      localStorage.setItem('userData', data.user_type);
+
+      // Assuming dispatch is defined elsewhere and accessible here
+      dispatch({ type: 'LOGIN', payload: { user: token, user_type: data.user_type } });
+
+      // Redirect to dashboard on successful login
+      navigate('/'); // Make sure to import and use useNavigate here
+      toast.success('Login successful! Redirecting to the dashboard.');
+    } catch (error) {
+      console.error(error);
+      toast.error('An error occurred during login. Please try again.');
+      // Handle any error that occurred during login
     }
-
-    const data = await response.json();
-    const token = data.access_token; // Access the token directly from data
-
-    console.log('data after login:', token);
-
-    localStorage.setItem('accessToken', token);
-
-    // Assuming dispatch is defined elsewhere and accessible here
-    dispatch({ type: 'LOGIN', payload: { user: token } });
-
-    // Redirect to dashboard on successful login
-    navigate('/'); // Make sure to import and use useNavigate here
-    toast.success('Login successful! Redirecting to the dashboard.');
-  } catch (error) {
-    console.error(error);
-    toast.error('An error occurred during login. Please try again.');
-    // Handle any error that occurred during login
-  }
-};
+  };
 
   const register = async (email, username, password) => {
     const response = await axios.post('/api/auth/register', { email, username, password });
@@ -135,13 +136,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
+    const userData = localStorage.getItem('userData');
+
     const isAuthenticated = !!storedToken;
     console.log(isAuthenticated);
 
     if (isAuthenticated) {
-      dispatch({ type: 'INIT', payload: { isAuthenticated: true, user: storedToken } });
+      dispatch({
+        type: 'INIT',
+        payload: { isAuthenticated: true, user: storedToken, user_type: userData }
+      });
     } else {
-      dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null } });
+      dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null, user_type: null } });
     }
   }, []);
 

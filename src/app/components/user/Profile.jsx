@@ -17,7 +17,6 @@ import { FavoriteBorderOutlined, Reply } from '@mui/icons-material';
 import { BASE_URL } from '../../config';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 import { Span } from "app/components/Typography";
-
 import {
   Box, styled, TextField,
   Toolbar,
@@ -30,7 +29,7 @@ import {
   Menu,
   LinearProgress,
   Icon,
-  
+
 
 } from '@mui/material';
 import { Link } from 'react-router-dom';
@@ -99,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-function Profile( handleClose, open, editedItem ) {
+function Profile(handleClose, open, editedItem) {
   const classes = useStyles();
   const [imageData, setImageData] = useState('');
 
@@ -115,7 +114,7 @@ function Profile( handleClose, open, editedItem ) {
     setAnchorEl(event.currentTarget);
   };
 
- 
+
   const [activeTab, setActiveTab] = useState("tab1")
 
   const handleTabClick = (tabId) => {
@@ -136,7 +135,7 @@ function Profile( handleClose, open, editedItem ) {
     margin: '0 10px',
     borderRadius: '30%',
     boxShadow: '0 0px 0px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 1px #00c0ef',
-    backgroundColor:'#188ae2'
+    backgroundColor: '#188ae2'
 
 
 
@@ -145,20 +144,23 @@ function Profile( handleClose, open, editedItem ) {
     margin: '0 10px',
     borderRadius: '30%',
     boxShadow: '0 0px 0px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 1px #00c0ef',
-    backgroundColor:'#ff4081'
+    backgroundColor: '#ff4081'
 
 
 
   };
-  
+
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
-  const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
+
   const [formData, setFormData] = useState({
     name: '',
-   
+    email: '',
+    mobile: '',
+    company_name: '',
+    address: '',
     status: '',
   });
   // const refreshTable = () => {
@@ -173,24 +175,26 @@ function Profile( handleClose, open, editedItem ) {
     })
   }
   const handleFileChange = (e) => {
-     
-        
-    handleFileInputChange(e,setImageData);
+
+
+    handleFileInputChange(e, setImageData);
 
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/business_type/business_type/update`;
+    const endpoint = `${BASE_URL}/api/user/profile_update/713`;
     let em = [];
-
-
     try {
       const data = {
-        // id: formData.id,
-       name: formData.name,
-        status: formData.status,
+        users_id: "713",
 
+        name: formData.name,
+        email: formData.email,
+        mobile: formData.mobile,
+        company_name: formData.company_name,
+        address: formData.address,
+        status: formData.status,
       };
 
       const res = await fetch(endpoint, {
@@ -212,12 +216,9 @@ function Profile( handleClose, open, editedItem ) {
         let obj = { bgType: "success", message: `${responseData.message}` };
         em.push(obj);
       } else {
-
-
         const errorData = await res.json();
         //toast(errorData.message);
         let obj = { bgType: "error", message: `${errorData.message}` };
-
         em.push(obj);
         // bgtype = 'error';
         if (errorData.error) {
@@ -228,8 +229,6 @@ function Profile( handleClose, open, editedItem ) {
               let obj = { bgType: "error", message: `${key}: ${errorMessages}` };
               // em.push(`${key}: ${errorMessages}`);
               em.push(obj);
-
-
             }
           }
           console.log(em)
@@ -250,19 +249,37 @@ function Profile( handleClose, open, editedItem ) {
     setLoading(false);
   };
 
+  const getUsersDetails = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/user/profile_list/713`,
+        {
+          method: "GET",
+          headers: new Headers({
+            "token": token,
+            'Content-Type': 'application/json'
+          }),
+        });
+      const { data } = await res.json();
+      console.log(data[0])
+      setFormData({
+        name: data[0].name,
+        email: data[0].email,
+        mobile: data[0].mobile,
+        company_name: data[0].company_name,
+        address: data[0].address,
+        status: data[0].status,
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
-    console.log(editedItem)
-    setFormData({
-     
-    
-      // imageData: editedItem.imageData,
-    })
-    // setImageData(editedItem.image)
+    getUsersDetails();
+  }, [])
 
-  }, [editedItem])
-  
 
-  
+
 
 
 
@@ -273,14 +290,14 @@ function Profile( handleClose, open, editedItem ) {
           <Breadcrumb routeSegments={[{ name: 'Profile', path: '/user/profile' },
           { name: 'Form' }]} />
         </Box>
-       
-        </Container>
 
-       
-          <Typography sx={{ marginLeft: '100px' }} variant="h4">User Profile</Typography>
-     
+      </Container>
 
-     
+
+      <Typography sx={{ marginLeft: '100px' }} variant="h4">User Profile</Typography>
+
+
+
       <Container style={{ marginLeft: '20px' }} className="container-fluid" >
 
         <div className="profile-sidebar">
@@ -497,7 +514,7 @@ function Profile( handleClose, open, editedItem ) {
             </CardContent>
           </Card>
         </div>
-      
+
 
         <div className="profile-content card-topline-aqua">
           <div className="row ">
@@ -510,7 +527,7 @@ function Profile( handleClose, open, editedItem ) {
                   size="small"
                   onClick={() => handleTabClick('tab1')}
                 >
-                  About 
+                  About
                 </Button>
                 <Button style={buttonStyle}
                   variant={activeTab === 'tab2' ? 'contained' : 'outlined'}
@@ -538,147 +555,157 @@ function Profile( handleClose, open, editedItem ) {
                 {
                   activeTab === "tab1" && <div className={`tab-pane fontawesome-demo ${activeTab === 'tab1' ? 'active' : ''}`} id="tab1">
                     <div id="biography">
-                     
-                        <Grid container spacing={2}>
+
+                      <Grid container spacing={2}>
                         <form onSubmit={handleSubmit} className={classes.root}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <h2 className="card-title">About</h2>
-          <p className="small fst-italic">
-            Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.
-          </p>
-          <h2 className="card-title">Profile Details</h2>
-        </Grid>
-        <Grid container spacing={1}>
-            
-               <Grid item xs={12}>
-                  <TextField
-                    type="text"
-                    label="Full Name"
-                    name="fullName"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.fullName}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                    style={{width:"100%"}}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    type="text"
-                    label="Company Name"
-                    name="company"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.company}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                    style={{width:"100%"}}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    type="text"
-                    label="Address"
-                    name="address"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.address}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                    style={{width:"100%"}}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    type="text"
-                    label="Mobile"
-                    name="mobile"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.mobile}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                    style={{width:"100%"}}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    type="text"
-                    label="Email"
-                    name="email"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.email}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                    style={{width:"100%"}}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-            <TextField 
-              type="file"
-              name="image"
-              label="Image"
-              size="small"
-              onChange={handleFileChange}
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-              style={{width:"100%"}}
-            />
-          </Grid>
-          <Button
-  sx={{ marginTop: 3, marginLeft: 4 }} // Adjust the margin value as needed
-  color="primary"
-  variant="contained"
-  type="submit"
-  size="small"
->
-  <Icon>send</Icon>
-  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-</Button>
-                </Grid>
-                
-      </Grid>
-    </form>
-                        </Grid>
+                          <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                              <h2 className="card-title">About</h2>
+                              <p className="small fst-italic">
+                                Sunt est soluta temporibus accusantium neque nam maiores cumque temporibus. Tempora libero non est unde veniam est qui dolor. Ut sunt iure rerum quae quisquam autem eveniet perspiciatis odit. Fuga sequi sed ea saepe at unde.
+                              </p>
+                              <h2 className="card-title">Profile Details</h2>
+                            </Grid>
+                            <Grid container spacing={1}>
+                            {/* <TextField
+                                  type="hidden"
+                                  label="Full Name"
+                                  name="user_id"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.user_id}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                /> */}
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="text"
+                                  label="Full Name"
+                                  name="name"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.name}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="text"
+                                  label="Company Name"
+                                  name="company"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.company_name}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="text"
+                                  label="Address"
+                                  name="address"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.address}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="text"
+                                  label="Mobile"
+                                  name="mobile"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.mobile}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="text"
+                                  label="Email"
+                                  name="email"
+                                  size="small"
+                                  onChange={handleChange}
+                                  value={formData.email}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Grid item xs={12}>
+                                <TextField
+                                  type="file"
+                                  name="profile_pic"
+                                  label="Image"
+                                  size="small"
+                                  onChange={handleFileChange}
+                                  validators={["required"]}
+                                  errorMessages={["this field is required"]}
+                                  style={{ width: "100%" }}
+                                />
+                              </Grid>
+                              <Button
+                                sx={{ marginTop: 3, marginLeft: 4 }} // Adjust the margin value as needed
+                                color="primary"
+                                variant="contained"
+                                type="submit"
+                                size="small"
+                              >
+                                <Icon>send</Icon>
+                                <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
+                              </Button>
+                            </Grid>
+
+                          </Grid>
+                        </form>
+                      </Grid>
 
 
 
-                        <Divider sx={{ margin: '10px 0' }} />
-                        <Typography variant="body1" sx={{ mt: 3 }}>
-                          <strong>Completed my graduation in Arts</strong> from the well-known and renowned institution of India - SARDAR PATEL ARTS COLLEGE, BARODA in 2000-01, which was affiliated to M.S. University. I ranked in University exams from the same university from 1996-01.
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                          <strong>Worked as Professor and Head of the department</strong> at Sarda College, Rajkot, Gujarat from 2003-2015.
-                        </Typography>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                          <strong>Lorem Ipsum is simply dummy text</strong> of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries but also the leap into electronic typesetting, remaining essentially unchanged.
-                        </Typography>
-                        <Typography variant="h5" sx={{ mt: 4, fontWeight: 'bold' }}>
-                          Education
-                        </Typography>
-                        <Divider sx={{ margin: '16px 0' }} />
-                        <List sx={{ mt: 2 }}>
-                          <ListItem>B.A., Gujarat University, Ahmedabad, India.</ListItem>
-                          <ListItem>M.A., Gujarat University, Ahmedabad, India.</ListItem>
-                          <ListItem>P.H.D., Shaurashtra University, Rajkot</ListItem>
-                        </List>
-                        <Typography variant="h5" sx={{ mt: 4, fontWeight: 'bold' }}>
-                          Experience
-                        </Typography>
-                        <Divider sx={{ margin: '16px 0' }} />
-                        <List sx={{ mt: 2 }}>
-                          <ListItem>One year experience as Jr. Professor from April-2009 to March-2010 at B. J. Arts College, Ahmedabad.</ListItem>
-                          <ListItem>Three-year experience as Jr. Professor at V.S. Arts & Commerce College from April - 2008 to April - 2011.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                          <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                        </List>
-                       
-                    
+                      <Divider sx={{ margin: '10px 0' }} />
+                      <Typography variant="body1" sx={{ mt: 3 }}>
+                        <strong>Completed my graduation in Arts</strong> from the well-known and renowned institution of India - SARDAR PATEL ARTS COLLEGE, BARODA in 2000-01, which was affiliated to M.S. University. I ranked in University exams from the same university from 1996-01.
+                      </Typography>
+                      <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Worked as Professor and Head of the department</strong> at Sarda College, Rajkot, Gujarat from 2003-2015.
+                      </Typography>
+                      <Typography variant="body1" sx={{ mt: 2 }}>
+                        <strong>Lorem Ipsum is simply dummy text</strong> of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries but also the leap into electronic typesetting, remaining essentially unchanged.
+                      </Typography>
+                      <Typography variant="h5" sx={{ mt: 4, fontWeight: 'bold' }}>
+                        Education
+                      </Typography>
+                      <Divider sx={{ margin: '16px 0' }} />
+                      <List sx={{ mt: 2 }}>
+                        <ListItem>B.A., Gujarat University, Ahmedabad, India.</ListItem>
+                        <ListItem>M.A., Gujarat University, Ahmedabad, India.</ListItem>
+                        <ListItem>P.H.D., Shaurashtra University, Rajkot</ListItem>
+                      </List>
+                      <Typography variant="h5" sx={{ mt: 4, fontWeight: 'bold' }}>
+                        Experience
+                      </Typography>
+                      <Divider sx={{ margin: '16px 0' }} />
+                      <List sx={{ mt: 2 }}>
+                        <ListItem>One year experience as Jr. Professor from April-2009 to March-2010 at B. J. Arts College, Ahmedabad.</ListItem>
+                        <ListItem>Three-year experience as Jr. Professor at V.S. Arts & Commerce College from April - 2008 to April - 2011.</ListItem>
+                        <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
+                        <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
+                        <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
+                        <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
+                      </List>
+
+
                     </div>
                   </div>
                 }
@@ -889,7 +916,7 @@ function Profile( handleClose, open, editedItem ) {
                                   Like (5)
                                 </Button>
                                 <Button
-                                size="small"
+                                  size="small"
                                   variant="contained"
                                   className="bg-soundcloud"
                                   startIcon={<Reply />}
@@ -897,7 +924,7 @@ function Profile( handleClose, open, editedItem ) {
                                   Reply
                                 </Button>
                               </CardActions>
-<hr/>
+                              <hr />
                               <div className="col-lg-12 p-t-20 text-center ">
                                 <Button variant="contained" color="info" size="large">
                                   Load More
