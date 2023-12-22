@@ -13,7 +13,8 @@ import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
 import useAuth from 'app/hooks/useAuth';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -113,6 +114,8 @@ function Blog() {
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [imageData, setImageData] = useState('');
+  const [description, setDescription] = useState('');
+
 
 
 
@@ -187,10 +190,9 @@ function Blog() {
       const data = {
         title: formData.title,
         category_id: formData.category_id,
-        description: formData.description,
+        description: description,
         image: imageData,
       };
-
       const res = await fetch(endpoint, {
         method: "POST",
         body: JSON.stringify(data),
@@ -215,6 +217,7 @@ function Blog() {
             image: '',
           }
         )
+        setDescription("")
         let obj = { bgType: "success", message: `${responseData.message}` };
 
         em.push(obj);
@@ -421,8 +424,8 @@ function Blog() {
               // errorMessages={["this field is required"]}
             /> 
           </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+          <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+                  {/* <TextField
                     type="text"
                     name="description"
                     label="Description"
@@ -431,11 +434,13 @@ function Blog() {
                     value={formData.description}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
-                  />
+                  /> */}
+                   <ReactQuill fullWidth style={{ height:"100px"}} 
+                   value={description} onChange={setDescription}  theme="snow" />
                 </Grid>
               </Grid>
 
-              <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
+              <Button disabled={loading} style={{ marginTop: 60 }} color="primary" variant="contained"
                 type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
@@ -520,6 +525,7 @@ function Blog() {
                   <TableCell align="center">Image </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
+                  
 
                 </TableRow>
               </TableHead>

@@ -18,6 +18,9 @@ import Merchant from './components/ManageMerchant/Merchant';
 import BlogCategory from './components/Manageweb/BlogCategory';
 import Blog from './components/Manageweb/Blog';
 import Services from './components/Manageweb/Services';
+import About from './components/Manageweb/About';
+import TermsCondition from './components/Manageweb/TermsCondition';
+
 
 
 
@@ -78,6 +81,8 @@ const routes = [
       { path: '/Manageweb/BlogCategory', element: <BlogCategory /> },
       { path: '/Manageweb/Blog', element: <Blog /> },
       { path: '/Manageweb/Services', element: <Services /> },
+      { path: '/Manageweb/About', element: <About /> },
+      { path: '/Manageweb/TermsCondition', element: <TermsCondition /> },
 
 
       

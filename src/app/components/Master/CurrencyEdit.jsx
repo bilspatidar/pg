@@ -223,7 +223,7 @@ function CurrencyEdit({ handleClose, open, editedItem }) {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Button disabled={loading}
+              <Button 
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"

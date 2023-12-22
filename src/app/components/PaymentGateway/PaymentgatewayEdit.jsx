@@ -54,11 +54,11 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
   //   tableData();
   // }
   const fetchCurrency = async () => {
-    const endpoint = `${BASE_URL}/api/currency/currency`;
+    const endpoint = `${BASE_URL}/api/currency/currency_list`;
   
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token
         }),
@@ -287,7 +287,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
               <Grid container spacing={3}>
 
               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField   fullWidth
                     type="text"
                     name="name"
                     label="Name"
@@ -300,7 +300,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="short_name"
                     label="short Name"
@@ -312,7 +312,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="live_api"
                     label="Live Api"
@@ -324,7 +324,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="live_secret"
                     label="Live Secret"
@@ -336,7 +336,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="test_api"
                     label="Test Api"
@@ -348,7 +348,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="test_secret"
                     label="Test_Secret"
@@ -360,7 +360,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="live_url"
                     label="Live Url"
@@ -372,7 +372,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField fullWidth
                     type="text"
                     name="test_url"
                     label="Test Url"
@@ -384,7 +384,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="number"
                     name="daily_limit"
                     label="Daily Limit"
@@ -397,7 +397,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="number"
                     name="minLimit"
                     label="Min Limit"
@@ -409,7 +409,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="number"
                     name="maxLimit"
                     label="Max Limit"
@@ -422,7 +422,7 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
                 </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
+                  <TextField  fullWidth
                     type="text"
                     name="methodName"
                     label="Method Name"

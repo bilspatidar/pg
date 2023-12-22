@@ -309,14 +309,16 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     })
   }, [editedItem])
   useEffect(() => {
+    if (formData.country_id !== '') {
     fetchState();
+    }
   }, [formData.country_id])
 
   useEffect(() => {
+    if (formData.state_id !== '') {
     fetchCity();
+    }
   }, [formData.state_id])
-
-
   return (
     <>
       {
