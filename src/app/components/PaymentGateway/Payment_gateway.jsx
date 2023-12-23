@@ -127,11 +127,11 @@ function Payment_gateway() {
 
 
   const fetchCurrency = async () => {
-    const endpoint = `${BASE_URL}/api/currency/currency`;
+    const endpoint = `${BASE_URL}/api/currency/currency_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token
@@ -165,34 +165,77 @@ function Payment_gateway() {
 
 
   //Get Data from API 
-  async function geTableCellata() {
 
-    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/`;
-
+  async function geTableCellata(name, status,from_date,to_date,currency,card) {
+    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway_list`;
+  
     try {
+      const body = {};
+      if (name) {
+        body.name = name;
+      }
+      if (status) {
+        body.status = status;
+      }
+      if (from_date) {
+        body.from_date = from_date;
+      }
+      if (to_date) {
+        body.to_date = to_date;
+      }
+      if (currency) {
+        body.currency = currency;
+      }
+      if (card) {
+        body.card = card;
+      }
       const res = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token,
           'Content-Type': 'application/json'
         }),
+        body: JSON.stringify(body)
       });
-
+  
       const data = await res.json();
-      setTableData(data.data);
-      console.log(data)
       if (res.status !== 401) {
-        setTableData(data.data); // Set the fetched data to the local state variable
+        setTableData(data.data);
       }
-      if(res.status === 401 && data.message === "Token Time Expire."){
+      if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
-        history("session/signin")
+        history("session/signin");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
   }
+
+  const [filterFormData, setFilterFormData] = useState({
+    name: '',
+    status: '',
+    from_date: '', 
+    to_date: '',
+    currency:'',
+    card: '',
+   
+  });
+  const handleFilterFormChange = (e) => {
+    const { name, value } = e.target;
+    setFilterFormData({
+      ...filterFormData,
+      [name]: value,
+    });
+  };
+ 
+
+  const handleFilterFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { name, status, from_date, to_date, currency, card } = filterFormData;
+    await geTableCellata(name, status, from_date, to_date, currency, card);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -406,7 +449,7 @@ function Payment_gateway() {
           { name: 'Form' }]} />
         </Box>
         {
-          errorMsg && errorMsg.length > 0 && errorMsg.map((error, index) => (
+          errorMsg && errorMsg?.length > 0 && errorMsg.map((error, index) => (
             <div key={index}>
               <CustomSnackbar
                 message={
@@ -586,7 +629,7 @@ function Payment_gateway() {
                     multiple
                     options={currencys}
                     getOptionLabel={(currency) => `${currency.currency_name}-${currency.currency_code}`}
-                    value={currencys.filter((currency) => formData.currency.includes(currency.currency_code))}
+                    value={currencys?.filter((currency) => formData?.currency.includes(currency.currency_code))}
                     onChange={(event, newValues) => {
                     handleChange({
                     target: {
@@ -615,7 +658,7 @@ function Payment_gateway() {
                     multiple
                     options={cardss}
                     getOptionLabel={(card) => `${card.name}`}
-                    value={cardss.filter((card) => formData.cards.includes(card.name))}
+                    value={cardss?.filter((card) => formData?.cards.includes(card.name))}
                     onChange={(event, newValues) => {
                     handleChange({
                     target: {
@@ -665,43 +708,119 @@ function Payment_gateway() {
       </Container>
       <Container>
         <SimpleCard title="Payment Gateway Table">
-          <ValidatorForm className="filterForm">
+        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterTwo"
-                  label="Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                />
+              <TextField
+    id="filterOne"
+    label="Name"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="name"
+    value={filterFormData.name}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
+                <Grid item xs={12} md={3}>
+                <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                     id="filterTwo"
+                      name="status"
+                      onChange={handleFilterFormChange}
+                      value={filterFormData.status}
+                    >
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  </Grid>
+
+                
+             <Grid item xs={12} md={3}>
+  <Autocomplete
+    options={currencys}
+    getOptionLabel={(currency) => currency.currency_name}
+    value={currencys.find((currency) => currency.id === filterFormData.currency) || null}
+    onChange={(event, newValue) => {
+      handleFilterFormChange({
+        target: {
+          name: 'currency',
+          value: newValue ? newValue.currency_code : '', // assuming id is a string or number
+        },
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Currency Name"
+      
+        fullWidth
+        size="small"
+      />
+    )}
+  />
+</Grid>
+           
+
+             <Grid item xs={12} md={3}>
+                  <Autocomplete
+                    options={cardss}
+                    getOptionLabel={(card) => card.name}
+                    value={cardss.find((card) => card.id === filterFormData.card) || null}
+                    onChange={(event, newValue) => {
+                      handleFilterFormChange({
+                    target: {
+                    name: 'card',
+                    value: newValue ? newValue.name : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
+                    renderInput={(params) => (
+                   <TextField
+                      {...params}
+                      label="Card Name"
+                    
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>
+
+
+
+
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFour"
-                  label="From Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFive"
-                  label="To Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
+            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>

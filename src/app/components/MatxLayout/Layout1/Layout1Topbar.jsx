@@ -1,5 +1,8 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { BASE_URL } from '../../../config';
+
 import {
   Avatar,
   Hidden,
@@ -100,6 +103,36 @@ const Layout1Topbar = () => {
     }
     updateSidebarMode({ mode });
   };
+  const token = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
+
+ const [userData, setUserData] = useState({})
+
+
+  const getUsersDetails = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/user/profile_list/${userId}`,
+        {
+          method: "GET",
+          headers: new Headers({
+            "token": token,
+            'Content-Type': 'application/json'
+          }),
+        });
+      const { data } = await res.json();
+      console.log(data[0])
+      setUserData(data[0])
+  
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getUsersDetails();
+  }, [])
+
+
 
   return (
     <TopbarRoot>
@@ -137,7 +170,7 @@ const Layout1Topbar = () => {
               <UserMenu>
                 <Hidden xsDown>
                   <Span>
-                    Hi <strong>smith</strong>
+                    <strong>{userData.name}</strong>
                   </Span>
                 </Hidden>
                 {/* <Avatar src={user.avatar} sx={{ cursor: 'pointer' }} /> */}

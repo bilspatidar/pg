@@ -32,6 +32,8 @@ import {
 
 
 } from '@mui/material';
+import CustomSnackbar from '../CustomSnackbar';
+
 import { Link } from 'react-router-dom';
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
@@ -100,7 +102,6 @@ const useStyles = makeStyles((theme) => ({
 
 function Profile(handleClose, open, editedItem) {
   const classes = useStyles();
-  const [imageData, setImageData] = useState('');
 
   const blueColorStyle = {
     color: '#6eb5e1', // Set the color to blue
@@ -151,14 +152,20 @@ function Profile(handleClose, open, editedItem) {
   };
 
   const [loading, setLoading] = useState(true);
+  const [apiResponse, setApiResponse] = useState(null);
 
   const token = localStorage.getItem('accessToken');
+  const userId = localStorage.getItem('userId');
+  const [usersDetails, setUsersDetails] = useState({});
+
   const [errorMsg, setErrorMsg] = useState([]);
+  const [imageData, setImageData] = useState('');
 
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     mobile: '',
+    profile_pic: '',
     company_name: '',
     address: '',
     status: '',
@@ -180,14 +187,17 @@ function Profile(handleClose, open, editedItem) {
     handleFileInputChange(e, setImageData);
 
   };
+ 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/user/profile_update/713`;
+    const endpoint = `${BASE_URL}/api/user/profile_update/${userId}`;
     let em = [];
+
+
     try {
       const data = {
-        users_id: "713",
+        users_id: userId,
 
         name: formData.name,
         email: formData.email,
@@ -195,6 +205,7 @@ function Profile(handleClose, open, editedItem) {
         company_name: formData.company_name,
         address: formData.address,
         status: formData.status,
+        profile_pic: imageData,
       };
 
       const res = await fetch(endpoint, {
@@ -210,24 +221,38 @@ function Profile(handleClose, open, editedItem) {
 
       if (res.status === 200) {
         const responseData = await res.json();
-        ///toast.success(responseData.message);
-        console.log(responseData.message)
-        //setTableData(tableData);
+        getUsersDetails();
+        setFormData(
+          {
+            name: '',
+            email: '',
+            mobile: '',
+            profile_pic: '',
+            company_name: '',
+            address: '',
+            status: '',
+          }
+        )
         let obj = { bgType: "success", message: `${responseData.message}` };
+          console.log(responseData.message)
         em.push(obj);
       } else {
         const errorData = await res.json();
         //toast(errorData.message);
         let obj = { bgType: "error", message: `${errorData.message}` };
+
         em.push(obj);
         // bgtype = 'error';
-        if (errorData.error) {
-          for (const key in errorData.error) {
-            if (errorData.error.hasOwnProperty(key)) {
-              const errorMessages = errorData.error[key].join(', '); // Combine multiple error messages if any
-              //toast.error(`${key}: ${errorMessages}`);
-              let obj = { bgType: "error", message: `${key}: ${errorMessages}` };
-              // em.push(`${key}: ${errorMessages}`);
+        if (errorData.errors) {
+          for (const key in errorData.errors) {
+            if (errorData.errors.hasOwnProperty(key)) {
+              let errorMessage = errorData.errors[key];
+
+              // Check if error message is an array
+              if (Array.isArray(errorMessage)) {
+                errorMessage = errorMessage.join(', '); // Combine multiple error messages if it's an array
+              }
+              let obj = { bgType: "error", message: `${errorMessage}` };
               em.push(obj);
             }
           }
@@ -248,10 +273,9 @@ function Profile(handleClose, open, editedItem) {
     setErrorMsg(em)
     setLoading(false);
   };
-
   const getUsersDetails = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/user/profile_list/713`,
+      const res = await fetch(`${BASE_URL}/api/user/profile_list/${userId}`,
         {
           method: "GET",
           headers: new Headers({
@@ -261,12 +285,14 @@ function Profile(handleClose, open, editedItem) {
         });
       const { data } = await res.json();
       console.log(data[0])
+      setUsersDetails(data[0])
       setFormData({
         name: data[0].name,
         email: data[0].email,
         mobile: data[0].mobile,
         company_name: data[0].company_name,
         address: data[0].address,
+        imageData: data[0].profile_pic,
         status: data[0].status,
       })
     } catch (error) {
@@ -299,64 +325,85 @@ function Profile(handleClose, open, editedItem) {
 
 
       <Container style={{ marginLeft: '20px' }} className="container-fluid" >
-
+      {
+          errorMsg && errorMsg.length > 0 && errorMsg.map((error, index) => (
+            <div key={index}>
+              <CustomSnackbar
+                message={
+                  <ul>
+                    {errorMsg.map((error, index) => (
+                      <li key={index} className={index === 0 ? 'first-li-error-msg' : 'li-error-msg'}>{error.message} </li>
+                    ))}
+                  </ul>
+                }
+                severity={errorMsg[0].bgType}
+                autoHideDuration={4000}
+                onClose={() => setErrorMsg([])}
+              />
+            </div>
+          ))
+        }
         <div className="profile-sidebar">
           <div className="card card-topline-aqua">
             <div className="card-body no-padding height-9">
-              <div className="row">
-                <div className="profile-userpic">
-                  <img src="/assets/images/faces/2.jpg" className="img-responsive" alt="Image Description" />
+           
+            <div className="row">
+  <div className="profile-userpic">
 
-
-                </div>
-              </div>
+      <img src={formData.profile_pic} className="img-responsive" alt="Profile Picture" />
+   
+      
+   
+  </div>
+</div>
               <div className="profile-usertitle">
-                <div className="profile-usertitle-name">John Deo</div>
-                <div className="profile-usertitle-job">Jr. Professor</div>
+                <div className="profile-usertitle-name">{usersDetails.name}</div>
+                <div className="profile-usertitle-job"><h3>{usersDetails.company_name}</h3></div>
               </div>
+              
               <Grid container spacing={2}>
                 <Grid item xs={4}>
                   <Typography variant="body1">
-                    <b>Followers</b>
+                    <b>Email</b>
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
                   <Typography variant="body1" align="right" style={blueColorStyle}>
-                    1,200
+                  {usersDetails.email}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant="body1">
-                    <b>Following</b>
+                    <b>Mobile</b>
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
                   <Typography variant="body1" align="right" style={blueColorStyle}>
-                    750
+                  {usersDetails.mobile}
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
                   <Typography variant="body1">
-                    <b>Friends</b>
+                    <b>Address</b>
                   </Typography>
                 </Grid>
                 <Grid item xs={8}>
                   <Typography variant="body1" align="right" style={blueColorStyle}>
-                    11,172
+                  {usersDetails.address}
                   </Typography>
                 </Grid>
               </Grid>
-              <div className="profile-userbuttons">
+              {/* <div className="profile-userbuttons">
                 <Button variant="contained" color="primary" style={buttonStyle1}>
                   Follow
                 </Button>
                 <Button variant="contained" color="primary" style={buttonStyle2}>
                   Message
                 </Button>
-              </div>
+              </div> */}
             </div>
           </div>
-          <Card className={classes.card}>
+          {/* <Card className={classes.card}>
             <CardHeader style={{ borderTop: '3px solid #00c0ef' }}
               className={classes.header}
               title="About Me"
@@ -429,8 +476,8 @@ function Profile(handleClose, open, editedItem) {
                 </Grid>
               </Grid>
             </CardContent>
-          </Card>
-          <Card style={{ marginTop: '30px', backgroundColor: '#E7ECEF' }}>
+          </Card> */}
+          {/* <Card style={{ marginTop: '30px', backgroundColor: '#E7ECEF' }}>
             <CardHeader style={{ borderTop: '3px solid #00c0ef' }}
               className={classes.header}
               title="Address"
@@ -512,7 +559,7 @@ function Profile(handleClose, open, editedItem) {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
 
@@ -673,7 +720,7 @@ function Profile(handleClose, open, editedItem) {
 
 
 
-                      <Divider sx={{ margin: '10px 0' }} />
+                      {/* <Divider sx={{ margin: '10px 0' }} />
                       <Typography variant="body1" sx={{ mt: 3 }}>
                         <strong>Completed my graduation in Arts</strong> from the well-known and renowned institution of India - SARDAR PATEL ARTS COLLEGE, BARODA in 2000-01, which was affiliated to M.S. University. I ranked in University exams from the same university from 1996-01.
                       </Typography>
@@ -703,7 +750,7 @@ function Profile(handleClose, open, editedItem) {
                         <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
                         <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
                         <ListItem>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</ListItem>
-                      </List>
+                      </List> */}
 
 
                     </div>

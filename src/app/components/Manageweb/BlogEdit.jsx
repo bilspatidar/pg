@@ -12,7 +12,8 @@ import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 import Autocomplete from '@mui/material/Autocomplete';
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -33,6 +34,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
   const [errorMsg, setErrorMsg] = useState([]);
   const [imageData, setImageData] = useState('');
   const [categories, setCategories] = useState([]);
+  const [description, setDescription] = useState('');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -89,7 +91,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
         id: formData.id,
         title: formData.title,
         category_id: formData.category_id,
-        description: formData.description,
+        description: description,
         image: imageData,
         status: formData.status,
 
@@ -154,16 +156,17 @@ function BlogEdit({ handleClose, open, editedItem }) {
 
   useEffect(() => {
     fetchCategories();
-    console.log(editedItem)
+    console.log(editedItem.description)
     setFormData({
       id: editedItem.id,
       title: editedItem.title,
       category_id: editedItem.category_id,
-      description: editedItem.description,
+      // description: editedItem.description,
      
       status: editedItem.status,
 
 })
+setDescription(editedItem.description)
 setImageData(editedItem.image)
   }, [editedItem])
 
@@ -268,18 +271,7 @@ setImageData(editedItem.image)
               // errorMessages={["this field is required"]}
             /> 
           </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField fullWidth
-                    type="text"
-                    name="description"
-                    label="Description"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.description}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
+          
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -294,9 +286,24 @@ setImageData(editedItem.image)
                     </Select>
                   </FormControl>
                 </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+                  {/* <TextField fullWidth
+                    type="text"
+                    name="description"
+                    label="Description"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.description}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  /> */}
+ <ReactQuill fullWidth style={{ height:"100px"}} 
+                   value={description} onChange={setDescription}  theme="snow" />
+
+                </Grid>
               </Grid>
               <Button
-                style={{ marginTop: 30 }}
+                style={{ marginTop: 60 }}
                 color="primary"
                 variant="contained"
                 type="submit"

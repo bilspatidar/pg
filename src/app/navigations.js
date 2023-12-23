@@ -55,6 +55,8 @@ export const navigations = [
       { name: 'Blog Category', path: '/Manageweb/BlogCategory', iconText: 'T' },
       { name: 'Blog', path: '/Manageweb/Blog', iconText: 'T' },
       { name: 'Services', path: '/Manageweb/Services', iconText: 'T' },
+      { name: 'About', path: '/Manageweb/About', iconText: 'T' },
+      { name: 'Terms & Condition', path: '/Manageweb/TermsCondition', iconText: 'T' },
     
 
     ]

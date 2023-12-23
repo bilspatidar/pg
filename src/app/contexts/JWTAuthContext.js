@@ -9,7 +9,8 @@ const initialState = {
   user: null,
   isInitialised: false,
   isAuthenticated: false,
-  user_type: null
+  user_type: null,
+  user_id: null
 };
 
 const isValidToken = (accessToken) => {
@@ -33,18 +34,18 @@ const setSession = (accessToken) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'INIT': {
-      const { isAuthenticated, user, user_type } = action.payload;
-      return { ...state, isAuthenticated, isInitialised: true, user_type };
+      const { isAuthenticated, user, user_type, user_id } = action.payload;
+      return { ...state, isAuthenticated, isInitialised: true, user_type, user_id };
     }
 
     case 'LOGIN': {
-      const { user, user_type } = action.payload;
+      const { user, user_type ,user_id} = action.payload;
       console.log(user);
-      return { ...state, isAuthenticated: true, user, user_type };
+      return { ...state, isAuthenticated: true, user, user_type, user_id };
     }
 
     case 'LOGOUT': {
-      return { ...state, isAuthenticated: false, user: null, user_type: null };
+      return { ...state, isAuthenticated: false, user: null, user_type: null, user_id:null };
     }
 
     case 'REGISTER': {
@@ -96,9 +97,10 @@ export const AuthProvider = ({ children }) => {
       // user_type
       localStorage.setItem('accessToken', token);
       localStorage.setItem('userData', data.user_type);
+      localStorage.setItem("userId", data.users_id);
 
       // Assuming dispatch is defined elsewhere and accessible here
-      dispatch({ type: 'LOGIN', payload: { user: token, user_type: data.user_type } });
+      dispatch({ type: 'LOGIN', payload: { user: token, user_type: data.user_type, user_id: data.users_id } });
 
       // Redirect to dashboard on successful login
       navigate('/'); // Make sure to import and use useNavigate here
@@ -137,6 +139,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     const userData = localStorage.getItem('userData');
+    const userId = localStorage.getItem('userId');
 
     const isAuthenticated = !!storedToken;
     console.log(isAuthenticated);
@@ -144,10 +147,10 @@ export const AuthProvider = ({ children }) => {
     if (isAuthenticated) {
       dispatch({
         type: 'INIT',
-        payload: { isAuthenticated: true, user: storedToken, user_type: userData }
+        payload: { isAuthenticated: true, user: storedToken, user_type: userData, user_id: userId }
       });
     } else {
-      dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null, user_type: null } });
+      dispatch({ type: 'INIT', payload: { isAuthenticated: false, user: null, user_type: null, user_id: null } });
     }
   }, []);
 
