@@ -10,7 +10,10 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 import Autocomplete from '@mui/material/Autocomplete';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -23,27 +26,28 @@ const style = {
   p: 4,
 };
 
-function SubcategoriesEdit({ handleClose, open, editedItem }) {
+function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [merchants, setMerchants] = useState([]);
 
   const [formData, setFormData] = useState({
-    category_id:'',
-     name: '',
-     status: '',
-   
+    title: '',
+    merchant_id: '',
+    webhook_url: '',
+    status: '',
   });
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
   // }
-  
+ 
+
   const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/category/category_list`;
+    const endpoint = `${BASE_URL}/api/user/merchant_list`;
 
     try {
       const response = await fetch(endpoint, {
@@ -55,11 +59,12 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
       })
 
       const {data} = await response.json();
-      setCategories(data);
+      setMerchants(data);
     } catch (error) {
       console.log(error)
     }
   }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -70,17 +75,17 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category/update`;
+    const endpoint = `${BASE_URL}/api/user/merchant_keys/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-        category_id: formData.category_id,
-        name: formData.name,
+        title: formData.title,
+        merchant_id: formData.merchant_id,
+        webhook_url: formData.webhook_url,
         status: formData.status,
-       
 
       };
 
@@ -143,18 +148,19 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
 
   useEffect(() => {
     fetchCategories();
-    console.log(editedItem)
+    console.log(editedItem.description)
     setFormData({
       id: editedItem.id,
-      name: editedItem.name,
-      category_id: editedItem.category_id,
+      title: editedItem.title,
+        merchant_id: editedItem.merchant_id,
+        webhook_url: editedItem.webhook_url,
+     
       status: editedItem.status,
 
+})
 
-
-    })
   }, [editedItem])
-  
+
 
   return (
     <>
@@ -208,34 +214,22 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
               />
               <Grid container spacing={3}>
               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="name"
-                    label="Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.name}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <Autocomplete
-                    options={categories}
-                    getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
+                    options={merchants}
+                    getOptionLabel={(merchant) => merchant.name}
+                    value={merchants.find((merchant) => merchant.users_id === formData.merchant_id) || null}
                     onChange={(event, newValue) => {
                     handleChange({
                     target: {
-                    name: 'category_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                    name: 'merchant_id',
+                    value: newValue ? newValue.users_id : '', // assuming id is a string or number
                  },
                    });
                       }}
                     renderInput={(params) => (
                    <TextField
                       {...params}
-                      label="Category Name"
+                      label="Merchant Name"
                       required
                      fullWidth
                      size="small"
@@ -243,6 +237,20 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                  )}
                    />
             </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="text"
+                    name="title"
+                    label="Title"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.title}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+            
+               
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -257,9 +265,22 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                     </Select>
                   </FormControl>
                 </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="text"
+                    name="webhook_url"
+                    label="Webhook Url"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.webhook_url}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                  
+                </Grid>
               </Grid>
-              <Button 
-                style={{ marginTop: 30 }}
+              <Button
+                style={{ marginTop: 60 }}
                 color="primary"
                 variant="contained"
                 type="submit"
@@ -276,4 +297,4 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default SubcategoriesEdit;
+export default MerchantkeyslistEdit;

@@ -11,6 +11,7 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   Button,
   Container,
@@ -52,10 +53,11 @@ function TermsCondition({ handleClose, open, editedItem }) {
 
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     image: '',
     status: '',
   });
+  const [description, setDescription] = useState('');
+
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
@@ -82,11 +84,11 @@ function TermsCondition({ handleClose, open, editedItem }) {
       setFormData({
       
         title: data[0].title,
-       description: data[0].description,
         mobile: data[0].mobile,
         image: data[0].image,
         status: data[0].status,
       })
+      setDescription(data[0].description)
     } catch (error) {
       console.log(error)
     }
@@ -109,7 +111,7 @@ function TermsCondition({ handleClose, open, editedItem }) {
       const data = {
         id: "2",
         title: formData.title,
-        description: formData.description,
+        description: description,
         image: imageData,
         status: formData.status,
 
@@ -181,7 +183,7 @@ function TermsCondition({ handleClose, open, editedItem }) {
     <>
        <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Blog ', path: '/Manageweb/Blog ' },
+          <Breadcrumb routeSegments={[{ name: 'Terms & Condition ', path: '/Manageweb/TermsCondition ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -204,7 +206,7 @@ function TermsCondition({ handleClose, open, editedItem }) {
         }
 
         <Stack spacing={3}>
-          <SimpleCard title="Terms & Condition Form">
+          <SimpleCard title="TermsCondition Form">
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
               <TextField
@@ -255,8 +257,8 @@ function TermsCondition({ handleClose, open, editedItem }) {
             /> 
           </Grid>
 
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-             <textarea fullWidth
+          <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+             {/* <textarea fullWidth
                     type="text"
                     name="description"
 
@@ -268,11 +270,13 @@ function TermsCondition({ handleClose, open, editedItem }) {
                     value={formData.description}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
-                  />
+                  /> */}
+
+                  <ReactQuill fullWidth style={{ height:"120px"}} value={description} onChange={setDescription}  theme="snow" />
                 </Grid>
               </Grid>
 
-              <Button  style={{ marginTop: 30 }} color="primary" variant="contained"
+              <Button  style={{ marginTop: 60 }} color="primary" variant="contained"
                 type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>

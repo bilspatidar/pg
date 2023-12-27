@@ -15,11 +15,18 @@ import Countries from './components/Master/Countries';
 import State from './components/Master/State';
 import City from './components/Master/City';
 import Merchant from './components/ManageMerchant/Merchant';
+import Merchantkeyslist from './components/ManageMerchant/Merchantkeyslist'; // Adjust the path as per your actual file structure
 import BlogCategory from './components/Manageweb/BlogCategory';
 import Blog from './components/Manageweb/Blog';
 import Services from './components/Manageweb/Services';
 import About from './components/Manageweb/About';
 import TermsCondition from './components/Manageweb/TermsCondition';
+import PrivacyPolicies from './components/Manageweb/PrivacyPolicies';
+import RefundPolicy from './components/Manageweb/RefundPolicy';
+import Cancellation from './components/Manageweb/Cancellation';
+import ContactUs from './components/Manageweb/ContactUs';
+import Faq from './components/Manageweb/Faq';
+
 
 
 
@@ -78,11 +85,18 @@ const routes = [
       { path: '/PaymentGateway/Payment_gateway', element: <Payment_gateway /> },
 
       { path: '/ManageMerchant/merchant', element: <Merchant /> },
+      { path: '/ManageMerchant/Merchantkeyslist', element: <Merchantkeyslist/> },
       { path: '/Manageweb/BlogCategory', element: <BlogCategory /> },
       { path: '/Manageweb/Blog', element: <Blog /> },
       { path: '/Manageweb/Services', element: <Services /> },
       { path: '/Manageweb/About', element: <About /> },
       { path: '/Manageweb/TermsCondition', element: <TermsCondition /> },
+      { path: '/Manageweb/PrivacyPolicies', element: <PrivacyPolicies /> },
+      { path: '/Manageweb/RefundPolicy', element: <RefundPolicy /> },
+      { path: '/Manageweb/Cancellation', element: <Cancellation /> },
+      { path: '/Manageweb/ContactUs', element: <ContactUs /> },
+      { path: '/Manageweb/Faq', element: <Faq /> },
+     
 
 
       

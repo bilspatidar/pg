@@ -40,11 +40,11 @@ function CityEdit({ handleClose, open, editedItem }) {
   //   tableData();
   // }
   const fetchState = async () => {
-    const endpoint = `${BASE_URL}/api/state/state`;
+    const endpoint = `${BASE_URL}/api/state/state_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
         //   "ngrok-skip-browser-warning": true,
           "token": token

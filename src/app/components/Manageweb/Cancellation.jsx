@@ -43,7 +43,7 @@ const style = {
   p: 4,
 };
 
-function About({ handleClose, open, editedItem }) {
+function Cancellation({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
@@ -71,7 +71,7 @@ function About({ handleClose, open, editedItem }) {
 
   const getUsersDetails = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/pages/pages/1`,
+      const res = await fetch(`${BASE_URL}/api/pages/pages/5`,
         {
           method: "GET",
           headers: new Headers({
@@ -103,13 +103,13 @@ function About({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/pages/pages/update/1`;
+    const endpoint = `${BASE_URL}/api/pages/pages/update/5`;
     let em = [];
 
 
     try {
       const data = {
-        id: "1",
+        id: "5",
         title: formData.title,
         description: description,
         image: imageData,
@@ -183,7 +183,7 @@ function About({ handleClose, open, editedItem }) {
     <>
        <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'About ', path: '/Manageweb/About ' },
+          <Breadcrumb routeSegments={[{ name: 'Cancellation ', path: '/Manageweb/Cancellation ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -290,4 +290,4 @@ function About({ handleClose, open, editedItem }) {
   );
 }
 
-export default About;
+export default Cancellation;

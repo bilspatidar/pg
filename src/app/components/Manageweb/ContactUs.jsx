@@ -20,7 +20,7 @@ import {
   Icon,
   InputLabel,
   MenuItem,
-
+  TextareaAutosize,
   FormControl,
   Select,
   
@@ -43,7 +43,7 @@ const style = {
   p: 4,
 };
 
-function About({ handleClose, open, editedItem }) {
+function ContactUs({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
@@ -56,7 +56,6 @@ function About({ handleClose, open, editedItem }) {
     image: '',
     status: '',
   });
-  const [description, setDescription] = useState('');
 
   // const refreshTable = () => {
   //   //setTableData(tableData);
@@ -71,7 +70,7 @@ function About({ handleClose, open, editedItem }) {
 
   const getUsersDetails = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/pages/pages/1`,
+      const res = await fetch(`${BASE_URL}/api/pages/pages/6`,
         {
           method: "GET",
           headers: new Headers({
@@ -87,8 +86,14 @@ function About({ handleClose, open, editedItem }) {
         mobile: data[0].mobile,
         image: data[0].image,
         status: data[0].status,
+        contact_no: data[0].contact_no,
+        alt_contact_no: data[0].alt_contact_no,
+        email: data[0].email,
+        address1: data[0].address1,
+        address2: data[0].address2,
+        map_link: data[0].map_link,
       })
-      setDescription(data[0].description)
+   
     } catch (error) {
       console.log(error)
     }
@@ -103,18 +108,24 @@ function About({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/pages/pages/update/1`;
+    const endpoint = `${BASE_URL}/api/pages/pages/update/6`;
     let em = [];
 
 
     try {
       const data = {
-        id: "1",
+        id: "6",
         title: formData.title,
-        description: description,
+       
         image: imageData,
         status: formData.status,
-
+        contact_no: formData.contact_no,
+        alt_contact_no:formData.alt_contact_no,
+        email: formData.email,
+        address1: formData.address1,
+        address2: formData.address2,
+        map_link: formData.map_link,
+   
       };
 
       const res = await fetch(endpoint, {
@@ -183,7 +194,7 @@ function About({ handleClose, open, editedItem }) {
     <>
        <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'About ', path: '/Manageweb/About ' },
+          <Breadcrumb routeSegments={[{ name: 'Contact Us ', path: '/Manageweb/ContactUs ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -257,23 +268,83 @@ function About({ handleClose, open, editedItem }) {
             /> 
           </Grid>
 
-          <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
-             {/* <textarea fullWidth
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
                     type="text"
-                    name="description"
-
-                    label="Description"
+                    name="contact_no"
+                    label="Contact NO"
                     size="small"
-                    rows={6} // Adjust the number of rows as needed
-                    cols={50} // Adjust the number of columns as needed
                     onChange={handleChange}
-                    value={formData.description}
+                    value={formData.contact_no}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
-                  /> */}
-
-                  <ReactQuill fullWidth style={{ height:"120px"}} value={description} onChange={setDescription}  theme="snow" />
+                  />
                 </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="text"
+                    name="alt_contact_no"
+                    label="Alt Contact No"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.alt_contact_no}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+          
+          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="email"
+                    name="email"
+                    label="Email "
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.email}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Address 1"
+    name="address1"
+    aria-label="Address 1"
+    onChange={handleChange}
+    value={formData.address1}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
+                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Address 2"
+    name="address2"
+    aria-label="Address 2"
+    onChange={handleChange}
+    value={formData.address2}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
+
+<Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="map_link "
+    name="map_link"
+    aria-label="Map Link "
+    onChange={handleChange}
+    value={formData.map_link}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
               </Grid>
 
               <Button  style={{ marginTop: 60 }} color="primary" variant="contained"
@@ -290,4 +361,4 @@ function About({ handleClose, open, editedItem }) {
   );
 }
 
-export default About;
+export default ContactUs;

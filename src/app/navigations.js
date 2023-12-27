@@ -57,6 +57,11 @@ export const navigations = [
       { name: 'Services', path: '/Manageweb/Services', iconText: 'T' },
       { name: 'About', path: '/Manageweb/About', iconText: 'T' },
       { name: 'Terms & Condition', path: '/Manageweb/TermsCondition', iconText: 'T' },
+      { name: 'Privacy Policies', path: '/Manageweb/PrivacyPolicies', iconText: 'T' },
+      { name: 'Refund Policy', path: '/Manageweb/RefundPolicy', iconText: 'T' },
+      { name: 'Cancellation', path: '/Manageweb/Cancellation', iconText: 'T' },
+      { name: 'Contact Us', path: '/Manageweb/ContactUs', iconText: 'T' },
+      { name: 'Faq', path: '/Manageweb/Faq', iconText: 'T' },
     
 
     ]
@@ -70,6 +75,7 @@ export const navigations = [
 
 
       { name: 'Merchant', path: '/ManageMerchant/Merchant', iconText: 'T' },
+      { name: 'Merchant keys list', path: '/ManageMerchant/Merchantkeyslist', iconText: 'T' },
     
 
     ]

@@ -25,7 +25,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    IconButton,
+    Select,
     FormControl,
     Autocomplete,
 
@@ -108,11 +108,11 @@ function State() {
 
 
     const fetchCountries = async () => {
-        const endpoint = `${BASE_URL}/api/country/country`;
+        const endpoint = `${BASE_URL}/api/country/country_list`;
     
         try {
           const response = await fetch(endpoint, {
-            method: "get",
+            method: "POST",
             headers: new Headers({
             //   "ngrok-skip-browser-warning": true,
               "token": token
@@ -128,33 +128,69 @@ function State() {
 
 
     //Get Data from API 
-    async function geTableCellata() {
-
-        const endpoint = `${BASE_URL}/api/state/state`;
-
+    async function geTableCellata(name, status,from_date,to_date,country_id) {
+        const endpoint = `${BASE_URL}/api/state/state_list`;
+      
         try {
-            const res = await fetch(endpoint, {
-                method: "GET",
-                headers: new Headers({
-                    "token": token,
-                    'Content-Type': 'application/json'
-                }),
-            });
-
-            const data = await res.json();
+          const body = {};
+          if (name) {
+            body.name = name;
+          }
+          if (status) {
+            body.status = status;
+          }
+          if (from_date) {
+            body.from_date = from_date;
+          }
+          if (to_date) {
+            body.to_date = to_date;
+          }
+          if (country_id) {
+            body.country_id = country_id;
+          }
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: new Headers({
+              "token": token,
+              'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(body)
+          });
+      
+          const data = await res.json();
+          if (res.status !== 401) {
             setTableData(data.data);
-            if (res.status !== 401) {
-                setTableData(data.data); // Set the fetched data to the local state variable
-            }
-            if (res.status === 401 && data.message === "Token Time Expire.") {
-                await logout();
-                history("/session/signin")
-            }
+          }
+          if (res.status === 401 && data.message === "Token Time Expire.") {
+            await logout();
+            history("session/signin");
+          }
         } catch (error) {
-            console.error("Error fetching data:", error);
+          console.error("Error fetching data:", error);
         }
         setLoading(false);
-    }
+      }
+    
+      const [filterFormData, setFilterFormData] = useState({
+        name: '',
+        status: '',
+        from_date: '', 
+        to_date: '', 
+        country_id:''
+      });
+      const handleFilterFormChange = (e) => {
+        const { name, value } = e.target;
+        setFilterFormData({
+          ...filterFormData,
+          [name]: value,
+        });
+      };
+      const handleFilterFormSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const { name, status, from_date, to_date,country_id } = filterFormData; // Destructure from_date and to_date from filterFormData
+        await geTableCellata(name, status, from_date, to_date,country_id);
+      };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -411,51 +447,97 @@ function State() {
             </Container>
             <Container>
                 <SimpleCard title="State Table">
-                    <ValidatorForm className="filterForm">
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    id="filterTwo"
-                                    label="Name"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    id="filterFour"
-                                    label="From Date"
-                                    type="date"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={3}>
-                                <TextField
-                                    id="filterFive"
-                                    label="To Date"
-                                    type="date"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={2}>
-                                <Button color="primary" variant="contained" type="submit">
-                                    <Icon>send</Icon>
-                                    <Span sx={{ pl: 1, textTransform: "capitalize" }}>Search</Span>
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </ValidatorForm >
+                <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={3}>
+              <TextField
+    id="filterOne"
+    label="Name"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="name"
+    value={filterFormData.name}
+    onChange={handleFilterFormChange}
+  />
+
+              </Grid>
+              <Grid item xs={12} md={3}>
+                  <Autocomplete
+                    options={Countries}
+                    getOptionLabel={(country) => country.name}
+                    value={Countries.find((country) => country.id === filterFormData.country_id) || null}
+                    onChange={(event, newValue) => {
+                        handleFilterFormChange({
+                    target: {
+                    name: 'country_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
+                    renderInput={(params) => (
+                   <TextField
+                      {...params}
+                      label="Country Name"
+                     
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>       
+
+
+                <Grid item xs={12} md={3}>
+                <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                     id="filterTwo"
+                      name="status"
+                      onChange={handleFilterFormChange}
+                      value={filterFormData.status}
+                    >
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+              <Grid item xs={12} md={3}>
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
+              <Grid item xs={12} md={2}>
+                <Button color="primary" variant="contained" type="submit">
+                  <Icon>send</Icon>
+                  <Span sx={{ pl: 1, textTransform: "capitalize" }}>Search</Span>
+                </Button>
+              </Grid>
+            </Grid>
+          </ValidatorForm >
 
                     <Box width="100%" overflow="auto" mt={2}>
                         <Button

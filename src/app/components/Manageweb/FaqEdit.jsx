@@ -5,12 +5,13 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { Span } from "app/components/Typography";
 import { ValidatorForm } from "react-material-ui-form-validator";
-import { TextField, Grid, Select, MenuItem, Icon, FormControl, InputLabel, } from '@mui/material';
+import { TextField, Grid, Select, MenuItem, Icon, FormControl, InputLabel,TextareaAutosize } from '@mui/material';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
-import Autocomplete from '@mui/material/Autocomplete';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -23,43 +24,23 @@ const style = {
   p: 4,
 };
 
-function SubcategoriesEdit({ handleClose, open, editedItem }) {
+function FaqEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [imageData, setImageData] = useState('');
 
   const [formData, setFormData] = useState({
-    category_id:'',
-     name: '',
-     status: '',
-   
+    question: '',
+    answer: '',
+    status: '',
   });
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
   // }
-  
-  const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/category/category_list`;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
-          "token": token
-        }),  
-      })
-
-      const {data} = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -70,17 +51,16 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category/update`;
+    const endpoint = `${BASE_URL}/api/faq/faq/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-        category_id: formData.category_id,
-        name: formData.name,
+        question: formData.question,
+        answer: formData.answer,
         status: formData.status,
-       
 
       };
 
@@ -142,19 +122,20 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
   };
 
   useEffect(() => {
-    fetchCategories();
     console.log(editedItem)
     setFormData({
       id: editedItem.id,
-      name: editedItem.name,
-      category_id: editedItem.category_id,
+      question: editedItem.question,
+      answer: editedItem.answer,
       status: editedItem.status,
 
 
 
-    })
-  }, [editedItem])
   
+})
+setImageData(editedItem.image)
+  }, [editedItem])
+
 
   return (
     <>
@@ -207,42 +188,32 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                 style={{ display: 'none' }}
               />
               <Grid container spacing={3}>
-              <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="name"
-                    label="Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.name}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <Autocomplete
-                    options={categories}
-                    getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
-                    onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'category_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
-                    renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Category Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
+              <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Question "
+    name="question"
+    aria-label="Question "
+    onChange={handleChange}
+    value={formData.question}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
+<Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Answer "
+    name="answer"
+    aria-label="Answer "
+    onChange={handleChange}
+    value={formData.answer}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
@@ -258,7 +229,7 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
                   </FormControl>
                 </Grid>
               </Grid>
-              <Button 
+              <Button
                 style={{ marginTop: 30 }}
                 color="primary"
                 variant="contained"
@@ -276,4 +247,4 @@ function SubcategoriesEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default SubcategoriesEdit;
+export default FaqEdit;

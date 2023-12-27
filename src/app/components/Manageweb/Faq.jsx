@@ -11,12 +11,12 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-
 import useAuth from 'app/hooks/useAuth';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
-  Autocomplete,
   InputLabel,
   MenuItem,
   Grid,
@@ -27,7 +27,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  IconButton,
+  TextareaAutosize,
   FormControl,
   Select,
 
@@ -37,7 +37,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import SubcategoriesEdit from './SubcategoriesEdit';
+import FaqEdit from './FaqEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -73,14 +73,15 @@ const StyledTable = styled(Table)(({ theme }) => ({
   },
 }));
 
-function Subcategories() {
+function Faq() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
+
   const { logout } = useAuth();
 
   const history = useNavigate();
-
+  
   const handlePrint = () => {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
@@ -99,53 +100,76 @@ function Subcategories() {
 
   const tableRef = useRef(null);
 
-  const [categories, setCategories] = useState([]);
-  const [formData, setFormData] = useState({
 
-    category_id: '',
-    name: '',
-   
-    // status: '',
+  const [formData, setFormData] = useState({
+    question: '',
+    answer: '',
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
 
 
 
-  const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/category/category_list`;
+
+  
+
+  //Get Data from API 
+  async function geTableCellata() {
+
+    const endpoint = `${BASE_URL}/api/faq/faq_list`;
 
     try {
-      const response = await fetch(endpoint, {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
-          "token": token
-        }),  
-      })
+          "token": token,
+          'Content-Type': 'application/json'
+        }),
+      });
 
-      const {data} = await response.json();
-      setCategories(data);
+      const data = await res.json();
+      setTableData(data.data);
+      if (res.status !== 401) {
+        setTableData(data.data); // Set the fetched data to the local state variable
+      }
+      if(res.status === 401 && data.message === "Token Time Expire."){
+        await logout();
+        history("/session/signin")
+      }
     } catch (error) {
-      console.log(error)
+      console.error("Error fetching data:", error);
     }
+    setLoading(false);
   }
 
- 
- //Get Data from API 
- async function geTableCellata(name, status,category_id) {
-  const endpoint = `${BASE_URL}/api/sub_category/sub_category_list`;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    })
+  }
+
+//Get Data from API 
+async function geTableCellata(question,answer, status,from_date,to_date) {
+  const endpoint = `${BASE_URL}/api/faq/faq_list`;
 
   try {
     const body = {};
-    if (name) {
-      body.name = name;
+    if (question) {
+      body.question = question;
     }
+    if (answer) {
+        body.answer = answer;
+      }
     if (status) {
       body.status = status;
     }
-    if (category_id) {
-      body.category_id = category_id;
+    if (from_date) {
+      body.from_date = from_date;
+    }
+    if (to_date) {
+      body.to_date = to_date;
     }
     const res = await fetch(endpoint, {
       method: "POST",
@@ -170,13 +194,13 @@ function Subcategories() {
   setLoading(false);
 }
 
-
 const [filterFormData, setFilterFormData] = useState({
-  name: '',
-  category_id:'',
+    question: '',
+    answer: '',
   status: '',
+  from_date: '', 
+  to_date: '', 
  
-  // Add other fields related to the Filter Form here
 });
 const handleFilterFormChange = (e) => {
   const { name, value } = e.target;
@@ -188,34 +212,21 @@ const handleFilterFormChange = (e) => {
 const handleFilterFormSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
-  const { name, status,category_id} = filterFormData;
-  await geTableCellata(name, status,category_id);
+  const {question,answer, status, from_date, to_date } = filterFormData; // Destructure from_date and to_date from filterFormData
+  await geTableCellata(question,answer, status, from_date, to_date);
 };
-
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-  }
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category/add`;
+    const endpoint = `${BASE_URL}/api/faq/faq/add`;
     let em = [];
 
 
     try {
       const data = {
-        category_id: formData.category_id,
-        name: formData.name,
-       
-        // status:formData.status,
-
+        question: formData.question,
+        answer: formData.answer,
       };
 
       const res = await fetch(endpoint, {
@@ -236,10 +247,8 @@ const handleFilterFormSubmit = async (e) => {
         console.log(responseData.message)
         setFormData(
           {
-            category_id:'',
-                name: '',
-                // status: '',
-              
+            question: '',
+            answer: '',
           }
         )
         let obj = { bgType: "success", message: `${responseData.message}` };
@@ -287,7 +296,6 @@ const handleFilterFormSubmit = async (e) => {
 
   useEffect(() => {
     geTableCellata();
-    fetchCategories();
   }, []);
 
   const [page, setPage] = useState(0);
@@ -328,7 +336,7 @@ const handleFilterFormSubmit = async (e) => {
 
   const deleteItem = async () => {
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/faq/faq/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -373,7 +381,7 @@ const handleFilterFormSubmit = async (e) => {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Sub Categories', path: '/master/Subcategories ' },
+          <Breadcrumb routeSegments={[{ name: 'FAQ ', path: '/Manageweb/Faq ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -397,49 +405,37 @@ const handleFilterFormSubmit = async (e) => {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Sub Categories Form">
+          <SimpleCard title="FAQ Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
-                
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="name"
-                    label=" Name"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.name}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <Autocomplete
-                    options={categories}
-                    getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
-                    onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'category_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
-                    renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Category Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
-
+              <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Question "
+    name="question"
+    aria-label="Question "
+    onChange={handleChange}
+    value={formData.question}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
+<Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+  <TextareaAutosize
+    minRows={3} // You can adjust the number of rows as needed
+    maxRows={6} // You can adjust the number of rows as needed
+    placeholder="Answer "
+    name="answer"
+    aria-label="Answer "
+    onChange={handleChange}
+    value={formData.answer}
+    style={{ width: '100%', padding: '8px', resize: 'vertical' }}
+    required // Add your validation logic here if needed
+  />
+</Grid>
 
               </Grid>
 
@@ -454,45 +450,34 @@ const handleFilterFormSubmit = async (e) => {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Sub Categories Table">
+        <SimpleCard title="FAQ Table">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
               <TextField
     id="filterOne"
-    label="Name"
+    label="Question"
     variant="outlined"
     size="small"
     fullWidth
-    name="name"
-    value={filterFormData.name}
+    name="question"
+    value={filterFormData.question}
     onChange={handleFilterFormChange}
   />
               </Grid>
               <Grid item xs={12} md={3}>
-                  <Autocomplete
-                    options={categories}
-                    getOptionLabel={(category) => category.name}
-                    value={categories.find((category) => category.id === formData.category_id) || null}
-                    onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'category_id',
-                    value: newValue ? newValue.id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
-                    renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Category Name"
-                 
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
+              <TextField
+    id="filterOne"
+    label="Answer"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="answer"
+    value={filterFormData.answer}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
                 <Grid item xs={12} md={3}>
                 <FormControl size="small" fullWidth>
                     <InputLabel>Status</InputLabel>
@@ -508,6 +493,33 @@ const handleFilterFormSubmit = async (e) => {
                   </FormControl>
 
                   </Grid>
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+              <Grid item xs={12} md={3}>
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>
@@ -516,6 +528,7 @@ const handleFilterFormSubmit = async (e) => {
               </Grid>
             </Grid>
           </ValidatorForm >
+
 
           <Box width="100%" overflow="auto" mt={2}>
             <Button
@@ -539,8 +552,8 @@ const handleFilterFormSubmit = async (e) => {
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center">Category Name</TableCell>
-                  <TableCell align="center"> Name  </TableCell>
+                  <TableCell align="center"> Question</TableCell>
+                  <TableCell align="center">Answer </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
 
@@ -552,9 +565,11 @@ const handleFilterFormSubmit = async (e) => {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.category_id}</TableCell>
-                      <TableCell align="center">{item.name}</TableCell>
-                     
+                      <TableCell align="center">{item.question}</TableCell>
+                      <TableCell align="center">{item.answer}</TableCell>
+                      
+                      
+            
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -569,7 +584,7 @@ const handleFilterFormSubmit = async (e) => {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <SubcategoriesEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <FaqEdit editedItem={editedItem} handleClose={handleClose} open={open} />
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -616,4 +631,4 @@ const handleFilterFormSubmit = async (e) => {
   )
 }
 
-export default Subcategories;
+export default Faq;

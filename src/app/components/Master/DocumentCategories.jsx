@@ -112,33 +112,60 @@ function DocumentCategories() {
 
 
   //Get Data from API 
-  async function geTableCellata() {
-
-    const endpoint = `${BASE_URL}/api/document_category/document_category`;
-
+  async function geTableCellata(name, status) {
+    const endpoint = `${BASE_URL}/api/document_category/document_category_list`;
+  
     try {
+      const body = {};
+      if (name) {
+        body.name = name;
+      }
+      if (status) {
+        body.status = status;
+      }
+  
       const res = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token,
           'Content-Type': 'application/json'
         }),
+        body: JSON.stringify(body)
       });
-
+  
       const data = await res.json();
-      setTableData(data.data);
       if (res.status !== 401) {
-        setTableData(data.data); // Set the fetched data to the local state variable
+        setTableData(data.data);
       }
-      if(res.status === 401 && data.message === "Token Time Expire."){
-         await logout();
-        history("/session/signin")
+      if (res.status === 401 && data.message === "Token Time Expire.") {
+        await logout();
+        history("session/signin");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
   }
+  
+
+  const [filterFormData, setFilterFormData] = useState({
+    name: '',
+    status: '',
+    // Add other fields related to the Filter Form here
+  });
+  const handleFilterFormChange = (e) => {
+    const { name, value } = e.target;
+    setFilterFormData({
+      ...filterFormData,
+      [name]: value,
+    });
+  };
+  const handleFilterFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { name, status } = filterFormData;
+    await geTableCellata(name, status);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -373,43 +400,36 @@ function DocumentCategories() {
       </Container>
       <Container>
         <SimpleCard title="Document Categories Table">
-          <ValidatorForm className="filterForm">
+        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterTwo"
-                  label="Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                />
+              <TextField
+    id="filterOne"
+    label="Name"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="name"
+    value={filterFormData.name}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFour"
-                  label="From Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFive"
-                  label="To Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
+            
+                <Grid item xs={12} md={3}>
+                <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                     id="filterTwo"
+                      name="status"
+                      onChange={handleFilterFormChange}
+                      value={filterFormData.status}
+                    >
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  </Grid>
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>
