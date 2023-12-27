@@ -145,11 +145,11 @@ function Payment_gateway() {
     }
   }
   const fetchCard = async () => {
-    const endpoint = `${BASE_URL}/api/card/card`;
+    const endpoint = `${BASE_URL}/api/card/card_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token

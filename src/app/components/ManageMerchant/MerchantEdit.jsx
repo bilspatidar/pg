@@ -104,11 +104,11 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     }
   }
   const fetchCountries = async () => {
-    const endpoint = `${BASE_URL}/api/country/country`;
+    const endpoint = `${BASE_URL}/api/country/country_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
         //   "ngrok-skip-browser-warning": true,
           "token": token
@@ -125,11 +125,11 @@ function MerchantEdit({ handleClose, open, editedItem }) {
 
 
   const fetchBusinesstype = async () => {
-    const endpoint = `${BASE_URL}/api/business_type/business_type`;
+    const endpoint = `${BASE_URL}/api/business_type/business_type_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token
@@ -143,7 +143,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     }
   }
   const fatchsubcategories = async () => {
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category`;
+    const endpoint = `${BASE_URL}/api/sub_category/parent_sub_category/${formData.business_category_id}`;
 
     try {
       const response = await fetch(endpoint, {
@@ -161,11 +161,11 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     }
   }
   const fatchcategories = async () => {
-    const endpoint = `${BASE_URL}/api/category/category`;
+    const endpoint = `${BASE_URL}/api/category/category_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token
@@ -276,7 +276,7 @@ function MerchantEdit({ handleClose, open, editedItem }) {
   
   useEffect(() => {
     fetchBusinesstype();
-    fatchsubcategories();
+   
     fatchcategories();
     fetchCountries();
    
@@ -319,6 +319,11 @@ function MerchantEdit({ handleClose, open, editedItem }) {
     fetchCity();
     }
   }, [formData.state_id])
+  useEffect(() => {
+    if (formData.business_category_id !== '') {
+      fatchsubcategories();
+    }
+  }, [formData.business_category_id])
   return (
     <>
       {

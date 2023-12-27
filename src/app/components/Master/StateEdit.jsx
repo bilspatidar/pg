@@ -41,11 +41,11 @@ function StateEdit({ handleClose, open, editedItem }) {
   //   tableData();
   // }
   const fetchCountries = async () => {
-    const endpoint = `${BASE_URL}/api/country/country`;
+    const endpoint = `${BASE_URL}/api/country/country_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
         //   "ngrok-skip-browser-warning": true,
           "token": token

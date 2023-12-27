@@ -124,11 +124,11 @@ function Blog() {
     handleFileInputChange(e,setImageData);
   };
   const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/blog_category/blog_category`;
+    const endpoint = `${BASE_URL}/api/blog_category/blog_category_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
         //   "ngrok-skip-browser-warning": true,
           "token": token
@@ -142,33 +142,70 @@ function Blog() {
     }
   }
   //Get Data from API 
-  async function geTableCellata() {
-
-    const endpoint = `${BASE_URL}/api/blog/blog`;
-
+  //Get Data from API 
+  async function geTableCellata(title, status,from_date,to_date,category_id) {
+    const endpoint = `${BASE_URL}/api/blog/blog_list`;
+  
     try {
+      const body = {};
+      if (title) {
+        body.title = title;
+      }
+      if (status) {
+        body.status = status;
+      }
+      if (from_date) {
+        body.from_date = from_date;
+      }
+      if (to_date) {
+        body.to_date = to_date;
+      }
+      if (category_id) {
+        body.category_id = category_id;
+      }
       const res = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token,
           'Content-Type': 'application/json'
         }),
+        body: JSON.stringify(body)
       });
-
+  
       const data = await res.json();
-      setTableData(data.data);
       if (res.status !== 401) {
-        setTableData(data.data); // Set the fetched data to the local state variable
+        setTableData(data.data);
       }
-      if(res.status === 401 && data.message === "Token Time Expire."){
+      if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
-        history("/session/signin")
+        history("session/signin");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
   }
+
+  const [filterFormData, setFilterFormData] = useState({
+    title: '',
+    status: '',
+    from_date: '', 
+    to_date: '', 
+    category_id:''
+  });
+  const handleFilterFormChange = (e) => {
+    const { name, value } = e.target;
+    setFilterFormData({
+      ...filterFormData,
+      [name]: value,
+    });
+  };
+  const handleFilterFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { title, status, from_date, to_date,category_id } = filterFormData; // Destructure from_date and to_date from filterFormData
+    await geTableCellata(title, status, from_date, to_date,category_id);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -452,43 +489,89 @@ function Blog() {
       </Container>
       <Container>
         <SimpleCard title="Blog Table">
-          <ValidatorForm className="filterForm">
+        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterTwo"
-                  label="Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                />
+              <TextField
+    id="filterOne"
+    label="Tittle"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="title"
+    value={filterFormData.title}
+    onChange={handleFilterFormChange}
+  />
+
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFour"
-                  label="From Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+                    <Autocomplete
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === filterFormData.category_id) || null}
+                    onChange={(event, newValue) => {
+                      handleFilterFormChange({
+                    target: {
+                    name: 'category_id',
+                    value: newValue ? newValue.id : '', // assuming id is a string or number
+                 },
+                   });
+                      }}
+                    renderInput={(params) => (
+                   <TextField
+                      {...params}
+                      label="Category Name"
+                    
+                     fullWidth
+                     size="small"
+                            />
+                 )}
+                   />
+            </Grid>       
+
+
+                <Grid item xs={12} md={3}>
+                <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                     id="filterTwo"
+                      name="status"
+                      onChange={handleFilterFormChange}
+                      value={filterFormData.status}
+                    >
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFive"
-                  label="To Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
+            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>

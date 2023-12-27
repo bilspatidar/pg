@@ -43,11 +43,11 @@ function DocumentSubCategoriesEdit({ handleClose, open, editedItem }) {
   // }
 
   const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/document_category/document_category`;
+    const endpoint = `${BASE_URL}/api/document_category/document_category_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
           //   "ngrok-skip-browser-warning": true,
           "token": token

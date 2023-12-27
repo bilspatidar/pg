@@ -73,11 +73,11 @@ function PaymentgatewayEdit({ handleClose, open, editedItem }) {
     }
   };
   const fetchCard = async () => {
-    const endpoint = `${BASE_URL}/api/card/card`;
+    const endpoint = `${BASE_URL}/api/card/card_list`;
   
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token
         }),

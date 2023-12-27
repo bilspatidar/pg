@@ -173,11 +173,11 @@ function Merchant() {
     }
   }
   const fetchCountries = async () => {
-    const endpoint = `${BASE_URL}/api/country/country`;
+    const endpoint = `${BASE_URL}/api/country/country_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "get",
+        method: "POST",
         headers: new Headers({
           //   "ngrok-skip-browser-warning": true,
           "token": token
@@ -191,14 +191,12 @@ function Merchant() {
     }
   }
 
-
-
   const fetchBusinesstype = async () => {
-    const endpoint = `${BASE_URL}/api/business_type/business_type`;
+    const endpoint = `${BASE_URL}/api/business_type/business_type_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token
@@ -212,7 +210,7 @@ function Merchant() {
     }
   }
   const fatchsubcategories = async () => {
-    const endpoint = `${BASE_URL}/api/sub_category/sub_category`;
+    const endpoint = `${BASE_URL}/api/sub_category/parent_sub_category/${formData.business_category_id}`;
 
     try {
       const response = await fetch(endpoint, {
@@ -230,11 +228,11 @@ function Merchant() {
     }
   }
   const fatchcategories = async () => {
-    const endpoint = `${BASE_URL}/api/category/category`;
+    const endpoint = `${BASE_URL}/api/category/category_list`;
 
     try {
       const response = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           // "ngrok-skip-browser-warning": true,
           "token": token
@@ -248,35 +246,80 @@ function Merchant() {
     }
   }
 
+  
   //Get Data from API 
-  async function geTableCellata() {
-
+  async function geTableCellata(name, status,business_type_id,business_category_id,business_subcategory_id,from_date,to_date) {
     const endpoint = `${BASE_URL}/api/user/merchant_list`;
-
+  
     try {
+      const body = {};
+      if (name) {
+        body.name = name;
+      }
+      if (status) {
+        body.status = status;
+      }
+      if (from_date) {
+        body.from_date = from_date;
+      }
+      if (to_date) {
+        body.to_date = to_date;
+      }
+      if (business_type_id) {
+        body.business_type_id = business_type_id;
+      }
+      if (business_category_id) {
+        body.business_category_id = business_category_id;
+      }
+      if (business_subcategory_id) {
+        body.business_subcategory_id = business_subcategory_id;
+      }
       const res = await fetch(endpoint, {
-        method: "GET",
+        method: "POST",
         headers: new Headers({
           "token": token,
           'Content-Type': 'application/json'
         }),
+        body: JSON.stringify(body)
       });
-
+  
       const data = await res.json();
-      setTableData(data.data);
-      console.log(data)
       if (res.status !== 401) {
-        setTableData(data.data); // Set the fetched data to the local state variable
+        setTableData(data.data);
       }
       if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
-        history("session/signin")
+        history("session/signin");
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
   }
+
+  const [filterFormData, setFilterFormData] = useState({
+    name: '',
+    status: '',
+    from_date: '', 
+    to_date: '', 
+    business_type_id:'',
+    business_category_id:'',
+    business_subcategory_id:'',
+   
+  });
+  const handleFilterFormChange = (e) => {
+    const { name, value } = e.target;
+    setFilterFormData({
+      ...filterFormData,
+      [name]: value,
+    });
+  };
+  const handleFilterFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const { name, status,business_type_id,business_category_id,business_subcategory_id, from_date, to_date } = filterFormData; // Destructure from_date and to_date from filterFormData
+    await geTableCellata(name, status,business_type_id,business_category_id,business_subcategory_id, from_date, to_date);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -406,7 +449,6 @@ function Merchant() {
   useEffect(() => {
     geTableCellata();
     fetchBusinesstype();
-    fatchsubcategories();
     fatchcategories();
     fetchCountries();
   }, []);
@@ -423,6 +465,11 @@ function Merchant() {
     }
   }, [formData.state_id])
 
+  useEffect(() => {
+    if (formData.business_category_id !== '') {
+      fatchsubcategories();
+    }
+  }, [formData.business_category_id])
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -725,7 +772,7 @@ function Merchant() {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        label="Category Name *"
+                        label="Category Name"
                         required
                         fullWidth
                         size="small"
@@ -849,43 +896,138 @@ function Merchant() {
       </Container>
       <Container>
         <SimpleCard title="Merchant Table">
-          <ValidatorForm className="filterForm">
+        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterTwo"
-                  label="Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                />
+              <TextField
+    id="filterOne"
+    label="Name"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="name"
+    value={filterFormData.name}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
+                <Grid item xs={12} md={3}>
+                <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                     id="filterTwo"
+                      name="status"
+                      onChange={handleFilterFormChange}
+                      value={filterFormData.status}
+                    >
+                      <MenuItem value="Active">Active</MenuItem>
+                      <MenuItem value="Deactive">Deactive</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  </Grid>
+                  <Grid item xs={12} md={3}>
+                  <Autocomplete
+                    options={businesstypes}
+                    getOptionLabel={(businesstype) => businesstype.name}
+                    value={businesstypes.find((businesstype) => businesstype.id === filterFormData.business_type_id) || null}
+                    onChange={(event, newValue) => {
+                      handleFilterFormChange({
+                        target: {
+                          name: 'business_type_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Business Type"
+                       
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+
+
+                <Grid item xs={12} md={3}>
+                  <Autocomplete
+                    options={categories}
+                    getOptionLabel={(category) => category.name}
+                    value={categories.find((category) => category.id === filterFormData.business_category_id) || null}
+                    onChange={(event, newValue) => {
+                      handleFilterFormChange({
+                        target: {
+                          name: 'business_category_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Category Name"
+                       
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} md={3}>
+                  <Autocomplete
+                    options={subcategories}
+                    getOptionLabel={(subcategory) => subcategory.name}
+                    value={subcategories.find((subcategory) => subcategory.id === filterFormData.business_subcategory_id) || null}
+                    onChange={(event, newValue) => {
+                      handleFilterFormChange({
+                        target: {
+                          name: 'business_subcategory_id',
+                          value: newValue ? newValue.id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Sub Category"
+                        required
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
               <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFour"
-                  label="From Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
               </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  id="filterFive"
-                  label="To Date"
-                  type="date"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{
-                    shrink: true,
-                  }}
-                />
-              </Grid>
+            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>
