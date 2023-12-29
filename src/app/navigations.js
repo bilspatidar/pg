@@ -1,3 +1,5 @@
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+
 export const navigations = [
   { name: 'Super admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
   // {
@@ -33,7 +35,7 @@ export const navigations = [
  
   {
     name: 'Payment Gateway',
-    icon: 'settings',
+    icon: <AccountBalanceOutlinedIcon />,
 
     badge: { value: '', color: 'primary' },
     children: [
@@ -75,7 +77,22 @@ export const navigations = [
 
 
       { name: 'Merchant', path: '/ManageMerchant/Merchant', iconText: 'T' },
-      { name: 'Merchant keys list', path: '/ManageMerchant/Merchantkeyslist', iconText: 'T' },
+      { name: 'Merchant keys ', path: '/ManageMerchant/Merchantkeyslist', iconText: 'T' },
+      { name: 'Merchant Payment ', path: '/ManageMerchant/Merchantpaymentlink', iconText: 'T' },
+
+    
+
+    ]
+  },
+  {
+    name: 'Report',
+    icon: 'settings',
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Transaction', path: '/Report/transaction_list', iconText: 'T' },
     
 
     ]

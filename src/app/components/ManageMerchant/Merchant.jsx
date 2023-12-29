@@ -993,7 +993,6 @@ function Merchant() {
                       <TextField
                         {...params}
                         label="Sub Category"
-                        required
                         fullWidth
                         size="small"
                       />
