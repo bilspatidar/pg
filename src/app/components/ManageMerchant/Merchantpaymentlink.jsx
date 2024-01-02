@@ -64,15 +64,21 @@ const Small = styled('small')(({ bgcolor }) => ({
   boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
 }));
 
-const StyledTable = styled(Table)(({ theme }) => ({
-  whiteSpace: "pre",
-  "& thead": {
-    "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } },
-  },
-  "& tbody": {
-    "& tr": { "& TableCell": { paddingLeft: 0, textTransform: "capitalize" } },
-  },
-}));
+const StyledTable = styled(Table)`
+  width: 100%;
+  margin-bottom: 20px;
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+`;
 
 function Merchantpaymentlink() {
   const token = localStorage.getItem('accessToken');
@@ -86,9 +92,37 @@ function Merchantpaymentlink() {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
       printWindow.document.open();
-      printWindow.document.write('<html><head><title>Print</title></head><body>');
-      printWindow.document.write('<table>' + tableRef.current.innerHTML + '</table>');
-      printWindow.document.write('</body></html>');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print</title>
+            <style>
+              /* Define your CSS styles here */
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              body {
+                overflow-y: scroll; /* Enable vertical scrolling */
+              }
+            </style>
+          </head>
+          <body>
+            <div style="overflow-x:auto;">
+              <table>${tableRef.current.innerHTML}</table>
+            </div>
+          </body>
+        </html>
+      `);
       printWindow.document.close();
       printWindow.print();
       printWindow.close();
@@ -558,7 +592,7 @@ function Merchantpaymentlink() {
                 <>
 
                   <Grid container spacing={1} key={index}>
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
                       <TextField
                         type="text"
                         name="mid"
@@ -570,11 +604,11 @@ function Merchantpaymentlink() {
                         errorMessages={["this field is required"]}
                       />
                     </Grid>
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
                       <TextField
                         type="number"
                         name="serial_no"
-                        label="Serial NO"
+                        label="Serial No"
                         size="small"
                         onChange={(event) => handleRowChange(index, event)}
                         value={row.serial_no}
@@ -582,7 +616,7 @@ function Merchantpaymentlink() {
                         errorMessages={["this field is required"]}
                       />
                     </Grid>
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
 
                       <Autocomplete
                         options={payments}
@@ -611,7 +645,7 @@ function Merchantpaymentlink() {
                       />
                     </Grid>
 
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
                       <FormControl fullWidth size="small">
                         <Autocomplete
                           options={currencys}
@@ -631,7 +665,7 @@ function Merchantpaymentlink() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="currency Name"
+                              label="Currency Name"
                               required
                               fullWidth
                               size="small"
@@ -642,7 +676,7 @@ function Merchantpaymentlink() {
                     </Grid>
 
 
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
                       <FormControl fullWidth size="small">
                         <Autocomplete
                           options={cardss}
@@ -662,7 +696,7 @@ function Merchantpaymentlink() {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="card Name"
+                              label="Card Name"
                               required
                               fullWidth
                               size="small"
@@ -671,13 +705,14 @@ function Merchantpaymentlink() {
                         />
                       </FormControl>
                     </Grid>
-                    <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                    <Grid item lg={2} md={2} sm={12} xs={12} sx={{ mt: 1 }}>
 
-                      <Button variant="contained" onClick={addRow}>
-                        Add Row
+                      <Button  variant="contained" sx={{ minWidth: '20px',  fontSize: '0.75rem' }}  onClick={addRow}>
+                        +
                       </Button>
-                      <Button sx={{ ml: 1 }} variant="contained" color="error" onClick={() => deleteRow(index)}>
-                        Cancel
+                      <Button  variant="contained" sx={{ ml: 1,minWidth: '20px',  fontSize: '0.75rem' }} color="error"
+                       onClick={() => deleteRow(index)}>
+                        -
                       </Button>
 
                     </Grid>
@@ -884,6 +919,7 @@ function Merchantpaymentlink() {
                 backgroundColor: '#2A0604', // Set the desired darker color
                 color: 'white',
                 height: 30,
+                marginBottom: 10,
               }}
             >
               Print
@@ -897,6 +933,7 @@ function Merchantpaymentlink() {
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
                   <TableCell align="center"> MID</TableCell>
+                  <TableCell align="center">Serial No</TableCell>
                   <TableCell align="center">Merchant Name </TableCell>
                   <TableCell align="center">Payment Name</TableCell>
                   <TableCell align="center">Currency</TableCell>
@@ -913,6 +950,7 @@ function Merchantpaymentlink() {
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
                       <TableCell align="center">{item.mid}</TableCell>
+                      <TableCell align="center">{item.serial_no}</TableCell>
                       <TableCell align="center">{item.merchant_name}</TableCell>
                       <TableCell align="center">{item.payment_id}</TableCell>
                       <TableCell align="center">{item.currency}</TableCell>

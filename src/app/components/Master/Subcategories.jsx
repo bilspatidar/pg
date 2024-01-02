@@ -63,16 +63,21 @@ const Small = styled('small')(({ bgcolor }) => ({
   boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
 }));
 
-const StyledTable = styled(Table)(({ theme }) => ({
-  whiteSpace: "pre",
-  "& thead": {
-    "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } },
-  },
-  "& tbody": {
-    "& tr": { "& TableCell": { paddingLeft: 0, textTransform: "capitalize" } },
-  },
-}));
+const StyledTable = styled(Table)`
+  width: 100%;
+  margin-bottom: 20px;
 
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+`;
 function Subcategories() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
@@ -85,9 +90,38 @@ function Subcategories() {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
       printWindow.document.open();
-      printWindow.document.write('<html><head><title>Print</title></head><body>');
-      printWindow.document.write('<table>' + tableRef.current.innerHTML + '</table>');
-      printWindow.document.write('</body></html>');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print</title>
+            <style>
+              /* Define your CSS styles here */
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+                
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              body {
+                overflow-y: scroll; /* Enable vertical scrolling */
+              }
+            </style>
+          </head>
+          <body>
+            <div style="overflow-x:auto;">
+              <table>${tableRef.current.innerHTML}</table>
+            </div>
+          </body>
+        </html>
+      `);
       printWindow.document.close();
       printWindow.print();
       printWindow.close();
@@ -527,6 +561,7 @@ const handleFilterFormSubmit = async (e) => {
                 backgroundColor: '#2A0604', // Set the desired darker color
                 color: 'white',
                 height: 30,
+                marginBottom: 10,
               }}
             >
               Print
@@ -552,7 +587,7 @@ const handleFilterFormSubmit = async (e) => {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.category_id}</TableCell>
+                      <TableCell align="center">{item.category_name}</TableCell>
                       <TableCell align="center">{item.name}</TableCell>
                      
                       <TableCell align="center">

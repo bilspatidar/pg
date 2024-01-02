@@ -1,5 +1,7 @@
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
-
+import ReportIcon from '@mui/icons-material/Report';
+import LanguageIcon from '@mui/icons-material/Language';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 export const navigations = [
   { name: 'Super admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
   // {
@@ -48,7 +50,7 @@ export const navigations = [
   },
   {
     name: 'Manage Web',
-    icon: 'settings',
+    icon: <LanguageIcon/>,
 
     badge: { value: '', color: 'primary' },
     children: [
@@ -70,7 +72,7 @@ export const navigations = [
   },
   {
     name: 'Manage Merchant',
-    icon: 'settings',
+    icon: <StorefrontIcon/>,
 
     badge: { value: '', color: 'primary' },
     children: [
@@ -86,7 +88,7 @@ export const navigations = [
   },
   {
     name: 'Report',
-    icon: 'settings',
+    icon: <ReportIcon/>,
 
     badge: { value: '', color: 'primary' },
     children: [

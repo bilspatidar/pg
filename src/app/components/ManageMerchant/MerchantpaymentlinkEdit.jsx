@@ -284,7 +284,7 @@ function MerchantpaymentlinkEdit({ handleClose, open, editedItem }) {
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
-                <Grid item lg={3} md={3} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                       
                        <TextField fullWidth
                     type="number"
@@ -375,7 +375,7 @@ function MerchantpaymentlinkEdit({ handleClose, open, editedItem }) {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="currency Name"
+                              label="Currency Name"
                               required
                               fullWidth
                               size="small"
@@ -407,7 +407,7 @@ function MerchantpaymentlinkEdit({ handleClose, open, editedItem }) {
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              label="card Name"
+                              label="Card Name"
                               required
                               fullWidth
                               size="small"
