@@ -12,6 +12,8 @@ import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
 import useAuth from 'app/hooks/useAuth';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -61,16 +63,21 @@ const Small = styled('small')(({ bgcolor }) => ({
   boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
 }));
 
-const StyledTable = styled(Table)(({ theme }) => ({
-  whiteSpace: "pre",
-  "& thead": {
-    "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } },
-  },
-  "& tbody": {
-    "& tr": { "& TableCell": { paddingLeft: 0, textTransform: "capitalize" } },
-  },
-}));
+const StyledTable = styled(Table)`
+  width: 100%;
+  margin-bottom: 20px;
 
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+`;
 function Categories() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
@@ -84,9 +91,37 @@ function Categories() {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
       printWindow.document.open();
-      printWindow.document.write('<html><head><title>Print</title></head><body>');
-      printWindow.document.write('<table>' + tableRef.current.innerHTML + '</table>');
-      printWindow.document.write('</body></html>');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print</title>
+            <style>
+              /* Define your CSS styles here */
+              table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+              }
+              th, td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+              }
+              th {
+                background-color: #f2f2f2;
+              }
+              body {
+                overflow-y: scroll; /* Enable vertical scrolling */
+              }
+            </style>
+          </head>
+          <body>
+            <div style="overflow-x:auto;">
+              <table>${tableRef.current.innerHTML}</table>
+            </div>
+          </body>
+        </html>
+      `);
       printWindow.document.close();
       printWindow.print();
       printWindow.close();
@@ -97,12 +132,14 @@ function Categories() {
   const [deletedItemId, setDeletedItemId] = React.useState();
 
   const tableRef = useRef(null);
+  const [imageData, setImageData] = useState('');
 
 
   const [formData, setFormData] = useState({
 
     name: '',
     shortName: '',
+    image: '',
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -162,7 +199,9 @@ const handleFilterFormSubmit = async (e) => {
   const { name, status } = filterFormData;
   await geTableCellata(name, status);
 };
-
+const handleFileChange = (e) => {
+  handleFileInputChange(e,setImageData);
+};
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -184,7 +223,7 @@ const handleFilterFormSubmit = async (e) => {
       const data = {
         name: formData.name,
         shortName: formData.shortName,
-
+        image: imageData,
       };
 
       const res = await fetch(endpoint, {
@@ -207,6 +246,7 @@ const handleFilterFormSubmit = async (e) => {
           {
             name: '',
             shortName: '',
+            image: '',
           }
         )
         let obj = { bgType: "success", message: `${responseData.message}` };
@@ -393,7 +433,19 @@ const handleFilterFormSubmit = async (e) => {
                   />
                 </Grid>
 
-
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                    
+                    <TextField
+                        type="file"
+                        name="image"
+                        label="Image"
+                        size="small"
+                        onChange={handleFileChange}
+                   
+                        // validators={["required"]}
+                        // errorMessages={["this field is required"]}
+                      /> 
+                    </Grid>
 
 
               </Grid>
@@ -460,6 +512,7 @@ const handleFilterFormSubmit = async (e) => {
                 backgroundColor: '#2A0604', // Set the desired darker color
                 color: 'white',
                 height: 30,
+                marginBottom: 10,
               }}
             >
               Print
@@ -474,6 +527,7 @@ const handleFilterFormSubmit = async (e) => {
                   <TableCell align="left">Sr no.</TableCell>
                   <TableCell align="center"> Name</TableCell>
                   <TableCell align="center">Short Name  </TableCell>
+                  <TableCell align="center">Image </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
 
@@ -487,6 +541,19 @@ const handleFilterFormSubmit = async (e) => {
                       <TableCell align="left">{index + 1}</TableCell>
                       <TableCell align="center">{item.name}</TableCell>
                       <TableCell align="center">{item.shortName}</TableCell>
+                      <TableCell align="center">
+        {item.image ? (
+          <a href={item.image} target="_blank" rel="noopener noreferrer">
+            <img
+              style={{ height: '50px', width: '50px' }}
+              src={item.image}
+              alt="Item Image"
+            />
+          </a>
+        ) : (
+          <span>No Image Available</span>
+        )}
+      </TableCell>
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>

@@ -9,6 +9,8 @@ import { TextField, Grid, Select, MenuItem, Icon, FormControl, InputLabel, } fro
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+
 import Loading from "../MatxLoading";
 
 const style = {
@@ -29,15 +31,24 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
+  const [imageData, setImageData] = useState('');
+
   const [formData, setFormData] = useState({
     name: '',
     shortName: '',
+    image: '',
     status: '',
   });
   // const refreshTable = () => {
   //   //setTableData(tableData);
   //   tableData();
   // }
+  const handleFileChange = (e) => {
+     
+        
+    handleFileInputChange(e,setImageData);
+
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -57,6 +68,7 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
         id: formData.id,
        name: formData.name,
         shortName: formData.shortName,
+        image:imageData, 
         status: formData.status,
 
       };
@@ -129,7 +141,9 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
 
 
     })
-  }, [editedItem])
+  setImageData(editedItem.image)
+}, [editedItem])
+
 
 
   return (
@@ -208,6 +222,18 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
                     errorMessages={["This field is required"]}
                   />
                 </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+          <TextField
+              type="file"
+              name="image"
+              label="Image"
+              size="small"
+              onChange={handleFileChange}
+         
+              // validators={["required"]}
+              // errorMessages={["this field is required"]}
+            /> 
+          </Grid>
 
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>

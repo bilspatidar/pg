@@ -1,3 +1,7 @@
+import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
+import ReportIcon from '@mui/icons-material/Report';
+import LanguageIcon from '@mui/icons-material/Language';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 export const navigations = [
   { name: 'Super admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
   // {
@@ -33,7 +37,7 @@ export const navigations = [
  
   {
     name: 'Payment Gateway',
-    icon: 'settings',
+    icon: <AccountBalanceOutlinedIcon />,
 
     badge: { value: '', color: 'primary' },
     children: [
@@ -46,7 +50,7 @@ export const navigations = [
   },
   {
     name: 'Manage Web',
-    icon: 'settings',
+    icon: <LanguageIcon/>,
 
     badge: { value: '', color: 'primary' },
     children: [
@@ -68,14 +72,29 @@ export const navigations = [
   },
   {
     name: 'Manage Merchant',
-    icon: 'settings',
+    icon: <StorefrontIcon/>,
 
     badge: { value: '', color: 'primary' },
     children: [
 
 
       { name: 'Merchant', path: '/ManageMerchant/Merchant', iconText: 'T' },
-      { name: 'Merchant keys list', path: '/ManageMerchant/Merchantkeyslist', iconText: 'T' },
+      { name: 'Merchant keys ', path: '/ManageMerchant/Merchantkeyslist', iconText: 'T' },
+      { name: 'Merchant Payment ', path: '/ManageMerchant/Merchantpaymentlink', iconText: 'T' },
+
+    
+
+    ]
+  },
+  {
+    name: 'Report',
+    icon: <ReportIcon/>,
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Transaction', path: '/Report/transaction_list', iconText: 'T' },
     
 
     ]

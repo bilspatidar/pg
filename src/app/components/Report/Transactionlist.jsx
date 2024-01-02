@@ -11,9 +11,8 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-import useAuth from 'app/hooks/useAuth';
-import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 
+import useAuth from 'app/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -29,16 +28,15 @@ import {
   TableRow,
   IconButton,
   FormControl,
-  Select,
   Autocomplete,
-
+  Select,
 
 } from "@mui/material";
 import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import ServicesEdit from './ServicesEdit';
+// import PaymentgatewayEdit from './PaymentgatewayEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -63,7 +61,6 @@ const Small = styled('small')(({ bgcolor }) => ({
   background: bgcolor,
   boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
 }));
-
 const StyledTable = styled(Table)`
   width: 100%;
   margin-bottom: 20px;
@@ -80,16 +77,14 @@ const StyledTable = styled(Table)`
   }
 `;
 
-function Services() {
+function Transactionlist() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
- 
-
   const { logout } = useAuth();
 
   const history = useNavigate();
-  
+
   const handlePrint = () => {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
@@ -137,42 +132,70 @@ function Services() {
   const tableRef = useRef(null);
 
 
-  const [formData, setFormData] = useState({
-
-            title: '',
-          
-            description: '',
-            image: '',
-  });
+  const [merchants, setMerchants] = useState([]);
+  const [payments, setpayments] = useState([]);
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [imageData, setImageData] = useState('');
 
-
-
-
-  const handleFileChange = (e) => {
-    handleFileInputChange(e,setImageData);
-  };
  
-  async function geTableCellata(title, status,from_date,to_date) {
-    const endpoint = `${BASE_URL}/api/services/services_list`;
+  const fetchCategories = async () => {
+    const endpoint = `${BASE_URL}/api/user/merchant_list`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setMerchants(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const fetchPayments = async () => {
+    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway_list`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setpayments(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  //Get Data from API 
+
+  async function geTableCellata( status,transaction_datetime,merchant_id,payment_id) {
+    const endpoint = `${BASE_URL}/api/transaction/transaction_list`;
   
     try {
       const body = {};
-      if (title) {
-        body.title = title;
-      }
+   
       if (status) {
         body.status = status;
       }
-      if (from_date) {
-        body.from_date = from_date;
+      if (transaction_datetime) {
+        body.transaction_datetime = transaction_datetime;
       }
-      if (to_date) {
-        body.to_date = to_date;
+    
+      if (merchant_id) {
+        body.merchant_id = merchant_id;
       }
-     
+      if (payment_id) {
+        body.payment_id = payment_id;
+      }
       const res = await fetch(endpoint, {
         method: "POST",
         headers: new Headers({
@@ -197,14 +220,17 @@ function Services() {
   }
 
   const [filterFormData, setFilterFormData] = useState({
-    title: '',
+   
     status: '',
-    from_date: '', 
-    to_date: '', 
-    
+    transaction_datetime: '', 
+    merchant_id: '',
+    payment_id:'',
+  
+   
   });
+  
   const handleFilterFormChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // Extract 'name' from e.target
     setFilterFormData({
       ...filterFormData,
       [name]: value,
@@ -213,104 +239,16 @@ function Services() {
   const handleFilterFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { title, status, from_date, to_date } = filterFormData; // Destructure from_date and to_date from filterFormData
-    await geTableCellata(title, status, from_date, to_date);
+    const {  status, transaction_datetime, merchant_id, payment_id } = filterFormData;
+    await geTableCellata( status, transaction_datetime, merchant_id, payment_id);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    })
-  }
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    const endpoint = `${BASE_URL}/api/services/services/add`;
-    let em = [];
-
-
-    try {
-      const data = {
-        title: formData.title,
-       
-        description: formData.description,
-        image: imageData,
-      };
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          // "ngrok-skip-browser-warning": true,
-          "token": token,
-          'Content-Type': 'application/json'
-        }),
-      });
-
-
-      if (res.status === 200) {
-        const responseData = await res.json();
-        geTableCellata();
-        ///toast.success(responseData.message);
-        console.log(responseData.message)
-        setFormData(
-          {
-            title: '',
-          
-            description: '',
-            image: '',
-          }
-        )
-        let obj = { bgType: "success", message: `${responseData.message}` };
-
-        em.push(obj);
-      } else {
-
-
-        const errorData = await res.json();
-        //toast(errorData.message);
-        let obj = { bgType: "error", message: `${errorData.message}` };
-
-        em.push(obj);
-        // bgtype = 'error';
-        if (errorData.errors) {
-          for (const key in errorData.errors) {
-            if (errorData.errors.hasOwnProperty(key)) {
-              let errorMessage = errorData.errors[key];
-
-              // Check if error message is an array
-              if (Array.isArray(errorMessage)) {
-                errorMessage = errorMessage.join(', '); // Combine multiple error messages if it's an array
-              }
-              let obj = { bgType: "error", message: `${errorMessage}` };
-              em.push(obj);
-            }
-          }
-          console.log(em)
-
-          console.log(errorMsg)
-
-        }
-
-      }
-    } catch (error) {
-      console.log(error)
-      let obj = { bgType: "error", message: `${error.message}` };
-
-      em.push(obj);
-
-    }
-    setErrorMsg(em)
-    setLoading(false);
-  };
+ 
 
   useEffect(() => {
     geTableCellata();
-   
+    fetchCategories();
+    fetchPayments();
   }, []);
 
   const [page, setPage] = useState(0);
@@ -351,7 +289,7 @@ function Services() {
 
   const deleteItem = async () => {
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/services/services/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/Paymentgateway/payment_gateway/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -394,102 +332,15 @@ function Services() {
     <>
 
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
+      
       <Container>
-        <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Services ', path: '/Manageweb/Services ' },
-          { name: 'Form' }]} />
-        </Box>
-        {
-          errorMsg && errorMsg.length > 0 && errorMsg.map((error, index) => (
-            <div key={index}>
-              <CustomSnackbar
-                message={
-                  <ul>
-                    {errorMsg.map((error, index) => (
-                      <li key={index} className={index === 0 ? 'first-li-error-msg' : 'li-error-msg'}>{error.message} </li>
-                    ))}
-                  </ul>
-                }
-                severity={errorMsg[0].bgType}
-                autoHideDuration={4000}
-                onClose={() => setErrorMsg([])}
-              />
-            </div>
-          ))
-        }
-
-        <Stack spacing={3}>
-          <SimpleCard title="Services Form">
-            <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-              <Grid container spacing={3}>
-             
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="title"
-                    label="Title"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.title}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                    
-          <TextField
-              type="file"
-              name="image"
-              label="Image"
-              size="small"
-              onChange={handleFileChange}
-         
-              // validators={["required"]}
-              // errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <TextField
-                    type="text"
-                    name="description"
-                    label="Description"
-                    size="small"
-                    onChange={handleChange}
-                    value={formData.description}
-                    validators={["required"]}
-                    errorMessages={["this field is required"]}
-                  />
-                </Grid>
-              </Grid>
-
-              <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
-                type="submit">
-                <Icon>send</Icon>
-                <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-              </Button>
-            </ValidatorForm>
-
-          </SimpleCard>
-        </Stack>
-      </Container>
-      <Container>
-        <SimpleCard title="Services Table">
+        <SimpleCard title="Payment Gateway Table">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
-              <Grid item xs={12} md={3}>
-              <TextField
-    id="filterOne"
-    label="Tittle"
-    variant="outlined"
-    size="small"
-    fullWidth
-    name="title"
-    value={filterFormData.title}
-    onChange={handleFilterFormChange}
-  />
-
-              </Grid>
-          <Grid item xs={12} md={3}>
+   
+             
+            
+                <Grid item xs={12} md={3}>
                 <FormControl size="small" fullWidth>
                     <InputLabel>Status</InputLabel>
                     <Select
@@ -504,29 +355,77 @@ function Services() {
                   </FormControl>
 
                   </Grid>
+
+                
                   <Grid item xs={12} md={3}>
-              <TextField
-    id="filterThree"
-    type="date"
-    label="From Date"
-    variant="outlined"
-    size="small"
-    fullWidth
-    name="from_date"
-    value={filterFormData.from_date}
-    onChange={handleFilterFormChange}
-  />
-              </Grid>
+
+<Autocomplete
+  options={payments}
+  getOptionLabel={(payment) => payment.name}
+  value={
+    payments.find((payment) => payment.id === filterFormData.payment_id) ||
+    null
+  }
+  onChange={(event, newValue) => {
+    handleFilterFormChange({
+      target: {
+        name: 'payment_id',
+        value: newValue ? newValue.id : '', // assuming id is a string or number
+      },
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Payment Name"
+
+      fullWidth
+      size="small"
+    />
+  )}
+/>
+</Grid>
+<Grid item xs={12} md={3}>
+
+<Autocomplete
+  options={merchants}
+  getOptionLabel={(merchant) => merchant.name}
+  value={
+    merchants.find((merchant) => merchant.users_id === filterFormData.merchant_id) ||
+    null
+  }
+  onChange={(event, newValue) => {
+    handleFilterFormChange({
+      target: {
+        name: 'merchant_id',
+        value: newValue ? newValue.users_id : '', // assuming id is a string or number
+      },
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label="Merchant Name"
+
+      fullWidth
+      size="small"
+    />
+  )}
+/>
+</Grid>
+
+
+             
               <Grid item xs={12} md={3}>
               <TextField
     id="filterFour"
     type="date"
-    label="To Date"
+    label="Transaction Datetime"
     variant="outlined"
     size="small"
     fullWidth
-    name="to_date"
-    value={filterFormData.to_date}
+    name="transaction_datetime"
+    value={filterFormData.transaction_datetime}
     onChange={handleFilterFormChange}
   />
               </Grid>
@@ -539,6 +438,7 @@ function Services() {
               </Grid>
             </Grid>
           </ValidatorForm >
+
           <Box width="100%" overflow="auto" mt={2}>
             <Button
 
@@ -556,14 +456,45 @@ function Services() {
 
             </Button>
 
-            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
+            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 6000 }} 
+            aria-label="caption table" >
 
               <TableHead>
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center"> Title</TableCell>
-                  <TableCell align="center">Image </TableCell>
+                  <TableCell align="center">Token</TableCell>
+                  <TableCell align="center">Payment Transaction Id </TableCell>
+                  <TableCell align="center">Merchant Transaction Id</TableCell>
+                  <TableCell align="center">Amount </TableCell>
+                  <TableCell align="center">Fee</TableCell>
+                  <TableCell align="center">Merchant Fee </TableCell>
+                  <TableCell align="center">Merchant Id</TableCell>
+                  <TableCell align="center">Mid </TableCell>
+                  <TableCell align="center">First Name</TableCell>
+                  <TableCell align="center">Last Name </TableCell>
+                  <TableCell align="center">Email</TableCell>
+                  <TableCell align="center">Phone </TableCell>
+                  <TableCell align="center">Currency</TableCell>
+                  <TableCell align="center">Address </TableCell>
+                  <TableCell align="center">City</TableCell>
+                  <TableCell align="center">State </TableCell>
+                  <TableCell align="center">Country</TableCell>
+                  <TableCell align="center">Callbackurl </TableCell>
+                  <TableCell align="center">RequestMode</TableCell>
+                  <TableCell align="center">Cardnumber </TableCell>
+                  <TableCell align="center">Cardholdername</TableCell>
+                  <TableCell align="center">Expirymonth</TableCell>
+                  <TableCell align="center">Expiryyear</TableCell>
+                  <TableCell align="center">Cardcvv</TableCell>
+                  <TableCell align="center">CardType</TableCell>
+                  <TableCell align="center">Payment Id</TableCell>
+                  <TableCell align="center">Initiated Datetime</TableCell>
+                  <TableCell align="center">Redirect Datetime</TableCell>
+                  <TableCell align="center">Callback Datetime</TableCell>
+                  <TableCell align="center">Webhook Datetime</TableCell>
+                  <TableCell align="center">Transaction Datetime</TableCell>
+                  <TableCell align="center">Message</TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
 
@@ -575,21 +506,40 @@ function Services() {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.title}</TableCell>
-                      <TableCell align="center">
-        {item.image ? (
-          <a href={item.image} target="_blank" rel="noopener noreferrer">
-            <img
-              style={{ height: '50px', width: '50px' }}
-              src={item.image}
-              alt="Item Image"
-            />
-          </a>
-        ) : (
-          <span>No Image Available</span>
-        )}
-      </TableCell>
-            
+                      <TableCell align="center">{item.token}</TableCell>
+                      <TableCell align="center">{item.payment_transaction_id}</TableCell>
+                      <TableCell align="center">{item.merchant_transaction_id}</TableCell>
+                      <TableCell align="center">{item.amount}</TableCell>
+                      <TableCell align="center">{item.fee}</TableCell>
+                      <TableCell align="center">{item.merchant_fee}</TableCell>
+                      <TableCell align="center">{item.merchant_id}</TableCell>
+                      <TableCell align="center">{item.mid}</TableCell>
+                    
+                      <TableCell align="center">{item.firstname}</TableCell>
+                      <TableCell align="center">{item.lastname}</TableCell>
+                      <TableCell align="center">{item.email}</TableCell>
+                      <TableCell align="center">{item.phone}</TableCell>
+                      <TableCell align="center">{item.currency}</TableCell>
+                      <TableCell align="center">{item.address}</TableCell>
+                      <TableCell align="center">{item.city}</TableCell>
+                      <TableCell align="center">{item.state}</TableCell>
+                      <TableCell align="center">{item.country}</TableCell>
+                      <TableCell align="center">{item.callbackurl}</TableCell>
+                      <TableCell align="center">{item.requestMode}</TableCell>
+                      <TableCell align="center">{item.cardnumber}</TableCell>
+                      <TableCell align="center">{item.cardholdername}</TableCell>
+                      <TableCell align="center">{item.expirymonth}</TableCell>
+                      <TableCell align="center">{item.expiryyear}</TableCell>
+                      <TableCell align="center">{item.cardcvv}</TableCell>
+                      <TableCell align="center">{item.cardType}</TableCell>
+                      <TableCell align="center">{item.payment_id}</TableCell>
+                      <TableCell align="center">{item.initiated_datetime}</TableCell>
+                      <TableCell align="center">{item.redirect_datetime}</TableCell>
+                      <TableCell align="center">{item.callback_datetime}</TableCell>
+                      <TableCell align="center">{item.webhook_datetime}</TableCell>
+                      <TableCell align="center">{item.transaction_datetime}</TableCell>
+                      <TableCell align="center">{item.message}</TableCell>
+                      
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -604,7 +554,7 @@ function Services() {
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <ServicesEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        {/* <PaymentgatewayEdit editedItem={editedItem} handleClose={handleClose} open={open} /> */}
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -618,7 +568,7 @@ function Services() {
             </StyledTable>
 
             <TablePagination
-              sx={{ px: 2 }}
+              sx={{ px: 2, minWidth: 6000 }}
               page={page}
               component="div"
               rowsPerPage={rowsPerPage}
@@ -651,4 +601,4 @@ function Services() {
   )
 }
 
-export default Services;
+export default Transactionlist;
