@@ -11,8 +11,10 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-
 import useAuth from 'app/hooks/useAuth';
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -26,8 +28,10 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  IconButton,
   FormControl,
   Select,
+  Typography,
 
 
 } from "@mui/material";
@@ -35,7 +39,7 @@ import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import BusinessTypeEdit from './BusinessTypeEdit';
+import ApiDocEdit from './ApiDocEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -76,15 +80,15 @@ const StyledTable = styled(Table)`
     background-color: #f2f2f2;
   }
 `;
-
-function BusinessTypes() {
+function ApiDoc() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
+
   const { logout } = useAuth();
 
   const history = useNavigate();
-
+  
   const handlePrint = () => {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
@@ -134,25 +138,50 @@ function BusinessTypes() {
 
   const [formData, setFormData] = useState({
 
-    name: '',
-   status:'',
+            title: '',
+            method: '',
+            menu_name: '',
+            url: '',
+            arrange: '',
+            header: '',
+            request: '',
+            response: '',
+            description: '',
+            details: '',
+            example: '',
+           
+           
+           
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-
+ 
+  const [header, setHeader] = useState('');
+  const [request, setRequest] = useState('');
+  const [response, setResponse] = useState('');
+  const [description, setDescription] = useState('');
+  const [details, setDetails] = useState('');
+  const [example, setExample] = useState('');
   //Get Data from API 
-  async function geTableCellata(name, status) {
-    const endpoint = `${BASE_URL}/api/business_type/business_type_list`;
+  //Get Data from API 
+  async function geTableCellata(title, status,from_date,to_date) {
+    const endpoint = `${BASE_URL}/api/api_documentation/api_documentation_list`;
   
     try {
       const body = {};
-      if (name) {
-        body.name = name;
+      if (title) {
+        body.title = title;
       }
       if (status) {
         body.status = status;
       }
-  
+      if (from_date) {
+        body.from_date = from_date;
+      }
+      if (to_date) {
+        body.to_date = to_date;
+      }
+     
       const res = await fetch(endpoint, {
         method: "POST",
         headers: new Headers({
@@ -175,12 +204,19 @@ function BusinessTypes() {
     }
     setLoading(false);
   }
-  
 
   const [filterFormData, setFilterFormData] = useState({
-    name: '',
-    status: '',
-    // Add other fields related to the Filter Form here
+    title: '',
+    method: '',
+    menu_name: '',
+    url: '',
+    arrange: '',
+    header: '',
+    request: '',
+    response: '',
+    description: '',
+    details: '',
+    example: '',
   });
   const handleFilterFormChange = (e) => {
     const { name, value } = e.target;
@@ -192,32 +228,41 @@ function BusinessTypes() {
   const handleFilterFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { name, status } = filterFormData;
-    await geTableCellata(name, status);
+    const { title, status, from_date, to_date } = filterFormData; // Destructure from_date and to_date from filterFormData
+    await geTableCellata(title, status, from_date, to_date);
   };
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value,
-    
+      [name]: value
     })
   }
- 
 
- const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/business_type/business_type/add`;
+    const endpoint = `${BASE_URL}/api/api_documentation/api_documentation/add`;
     let em = [];
 
 
     try {
       const data = {
-        name: formData.name,
-        
+       
+        title: formData.title,
+        method: formData.method,
+        menu_name: formData.menu_name,
+        url: formData.url,
+        arrange: formData.arrange,    
+        header: header,
+        request: request,
+        details: details,
+        response: response,
+        description: description,
+        example: example,
+      
       };
       const res = await fetch(endpoint, {
         method: "POST",
@@ -237,11 +282,25 @@ function BusinessTypes() {
         console.log(responseData.message)
         setFormData(
           {
-            name: '',
-           
+             title: '',
+    method: '',
+    menu_name: '',
+    url: '',
+    arrange: '',
+    header: '',
+    request: '',
+    response: '',
+    description: '',
+    details: '',
+    example: '',
           }
         )
-      
+        setHeader("")
+        setRequest("")
+        setResponse("")
+        setDetails("")
+        setExample("")
+        setDescription("")
         let obj = { bgType: "success", message: `${responseData.message}` };
 
         em.push(obj);
@@ -287,6 +346,7 @@ function BusinessTypes() {
 
   useEffect(() => {
     geTableCellata();
+
   }, []);
 
   const [page, setPage] = useState(0);
@@ -327,7 +387,7 @@ function BusinessTypes() {
 
   const deleteItem = async () => {
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/business_type/business_type/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/api_documentation/api_documentation/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -372,7 +432,7 @@ function BusinessTypes() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Business types', path: '/master/businesstypes ' },
+          <Breadcrumb routeSegments={[{ name: 'Blog ', path: '/Manageweb/Blog ' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -394,29 +454,114 @@ function BusinessTypes() {
           ))
         }
 
-
         <Stack spacing={3}>
-          <SimpleCard title="Business type Form">
-
-
-            <ValidatorForm onSubmit={handleSubmit} onError={() => null} data-form-identifier="add_form">
+          <SimpleCard title="Api Document Form">
+            <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
+              <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Method</InputLabel>
+                    <Select
+                      name="method"
+                      onChange={handleChange}
+                      value={formData.method}
+                    >
+                      <MenuItem value="GET">GET</MenuItem>
+                      <MenuItem value="Post">Post</MenuItem>
+                      <MenuItem value="PUT">PUT</MenuItem>
+                      <MenuItem value="Delete">Delete</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>    
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="name"
-                    label=" Name"
+                    name="title"
+                    label="Title"
                     size="small"
                     onChange={handleChange}
-                    value={formData.name}
+                    value={formData.title}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
-               
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="menu_name"
+                    label="Menu Name"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.menu_name}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="text"
+                    name="url"
+                    label="URL"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.url}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="number"
+                    name="arrange"
+                    label="Arrange"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.arrange}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Header</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={header} onChange={setHeader}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Request</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={request} onChange={setRequest}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Response</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={response} onChange={setResponse}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Description</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={description} onChange={setDescription}  theme="snow" />
+                </Grid>
+                
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Details</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={details} onChange={setDetails}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Example</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                 value={example} onChange={setExample}  theme="snow" />
+                </Grid>
+         
               </Grid>
 
-              <Button disabled={loading} style={{ marginTop: 30 }} color="primary" variant="contained"
+              <Button disabled={loading} style={{ marginTop: 60 }} color="primary" variant="contained"
                 type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
@@ -427,22 +572,25 @@ function BusinessTypes() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Business type List">
-          <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
+        <SimpleCard title="Api Document List">
+        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
               <TextField
     id="filterOne"
-    label="Name"
+    label="Tittle"
     variant="outlined"
     size="small"
     fullWidth
-    name="name"
-    value={filterFormData.name}
+    name="title"
+    value={filterFormData.title}
     onChange={handleFilterFormChange}
   />
+
               </Grid>
-            
+                
+
+
                 <Grid item xs={12} md={3}>
                 <FormControl size="small" fullWidth>
                     <InputLabel>Status</InputLabel>
@@ -458,6 +606,33 @@ function BusinessTypes() {
                   </FormControl>
 
                   </Grid>
+                  <Grid item xs={12} md={3}>
+              <TextField
+    id="filterThree"
+    type="date"
+    label="From Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="from_date"
+    value={filterFormData.from_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+              <Grid item xs={12} md={3}>
+              <TextField
+    id="filterFour"
+    type="date"
+    label="To Date"
+    variant="outlined"
+    size="small"
+    fullWidth
+    name="to_date"
+    value={filterFormData.to_date}
+    onChange={handleFilterFormChange}
+  />
+              </Grid>
+            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>
@@ -468,19 +643,21 @@ function BusinessTypes() {
           </ValidatorForm >
 
           <Box width="100%" overflow="auto" mt={2}>
-          <Button
-  variant="contained"
-  // color="primary"
-  onClick={() => handlePrint()}
-  style={{
-    backgroundColor: '#2A0604', // Set the desired darker color
-    color: 'white',
-    height: 30,
-    marginBottom: 10, // Corrected property name to add margin bottom
-  }}
->
-  Print
-</Button>
+            <Button
+
+              variant="contained"
+              // color="primary"
+              onClick={() => handlePrint()}
+              style={{
+                backgroundColor: '#2A0604', // Set the desired darker color
+                color: 'white',
+                height: 30,
+                marginBottom: 10,
+              }}
+            >
+              Print
+
+            </Button>
 
             <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
 
@@ -488,9 +665,12 @@ function BusinessTypes() {
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center"> Name</TableCell>
+                  <TableCell align="center"> Title</TableCell>
+                  <TableCell align="center">Method</TableCell>
+                  <TableCell align="center">url </TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
+                  
 
                 </TableRow>
               </TableHead>
@@ -500,8 +680,12 @@ function BusinessTypes() {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.name}</TableCell>
+                      <TableCell align="center">{item.title}</TableCell>
+                      <TableCell align="center">{item.method}</TableCell>
+                      <TableCell align="center">{item.url}</TableCell>
                      
+                    
+            
                       <TableCell align="center">
                         <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
                         }>
@@ -512,12 +696,11 @@ function BusinessTypes() {
                       <TableCell align="right">
 
 
-                        
-                      <ModeTwoToneIcon fontSize="small" style={{ color: '#173853' }}
+                        <ModeTwoToneIcon fontSize="small" style={{ color: '#173853' }}
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <BusinessTypeEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <ApiDocEdit editedItem={editedItem} handleClose={handleClose} open={open} />
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -564,4 +747,4 @@ function BusinessTypes() {
   )
 }
 
-export default BusinessTypes;
+export default ApiDoc;

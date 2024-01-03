@@ -405,7 +405,7 @@ function Countries() {
 
 
                 <Stack spacing={3}>
-                    <SimpleCard title="Countries Form">
+                    <SimpleCard title="Country Form">
 
 
                         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -450,7 +450,7 @@ function Countries() {
                 </Stack>
             </Container>
             <Container>
-                <SimpleCard title="Countries Table">
+                <SimpleCard title="Countries List">
                 <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

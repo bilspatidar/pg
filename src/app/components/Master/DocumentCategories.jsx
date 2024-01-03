@@ -399,7 +399,7 @@ function DocumentCategories() {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Document Categories Form">
+          <SimpleCard title="Document Category Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -433,7 +433,7 @@ function DocumentCategories() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Document Categories Table">
+        <SimpleCard title="Document Categories List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

@@ -27,7 +27,8 @@ import RefundPolicy from './components/Manageweb/RefundPolicy';
 import Cancellation from './components/Manageweb/Cancellation';
 import ContactUs from './components/Manageweb/ContactUs';
 import Faq from './components/Manageweb/Faq';
-import Transactionlist from './components/Report/Transactionlist';
+import Transactionlist from './components/Reports/Transactionlist';
+import ApiDoc from './components/ManageApiDoc/ApiDoc';
 
 
 
@@ -102,6 +103,7 @@ const routes = [
       { path: '/Manageweb/Faq', element: <Faq /> },
 
       { path: '/Report/transaction_list', element: <Transactionlist /> },
+      { path: '/ManageApiDoc/ApiDoc', element: <ApiDoc /> },
      
 
 
