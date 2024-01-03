@@ -28,19 +28,31 @@ const style = {
   height: "90%"
 };
 
-
-function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
+function ApiDocEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [merchants, setMerchants] = useState([]);
+  const [header, setHeader] = useState('');
+  const [request, setRequest] = useState('');
+  const [response, setResponse] = useState('');
+  const [description, setDescription] = useState('');
+  const [details, setDetails] = useState('');
+  const [example, setExample] = useState('');
 
   const [formData, setFormData] = useState({
-    title: '',
-    merchant_id: '',
-    webhook_url: '',
+            title: '',
+            method: '',
+            menu_name: '',
+            url: '',
+            arrange: '',
+            header: '',
+            request: '',
+            response: '',
+            description: '',
+            details: '',
+            example: '',
     status: '',
   });
   // const refreshTable = () => {
@@ -48,26 +60,7 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   //   tableData();
   // }
  
-
-  const fetchCategories = async () => {
-    const endpoint = `${BASE_URL}/api/user/merchant_list`;
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
-          "token": token
-        }),  
-      })
-
-      const {data} = await response.json();
-      setMerchants(data);
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -78,7 +71,7 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/user/merchant_keys/update`;
+    const endpoint = `${BASE_URL}/api/api_documentation/api_documentation/update`;
     let em = [];
 
 
@@ -86,8 +79,16 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
       const data = {
         id: formData.id,
         title: formData.title,
-        merchant_id: formData.merchant_id,
-        webhook_url: formData.webhook_url,
+        method: formData.method,
+        menu_name: formData.menu_name,
+        url: formData.url,
+        arrange: formData.arrange,    
+        header: header,
+        request: request,
+        details: details,
+        response: response,
+        description: description,
+        example: example,
         status: formData.status,
 
       };
@@ -150,17 +151,24 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   };
 
   useEffect(() => {
-    fetchCategories();
-    console.log(editedItem.description)
+   
+   
     setFormData({
       id: editedItem.id,
       title: editedItem.title,
-        merchant_id: editedItem.merchant_id,
-        webhook_url: editedItem.webhook_url,
-     
+      method: editedItem.method,
+      menu_name: editedItem.menu_name,
+      url: editedItem.url,
+      arrange: editedItem.arrange,     
       status: editedItem.status,
 
 })
+setHeader(editedItem.header)
+setRequest(editedItem.request)
+setResponse(editedItem.details)
+setDescription(editedItem.response)
+setDetails(editedItem.description)
+setExample(editedItem.example)
 
   }, [editedItem])
 
@@ -204,42 +212,24 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
             Edit Form
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <ValidatorForm className="custom-form-control" onSubmit={handleSubmit} onError={() => null}>
-              <TextField
-                fullWidth
-                type="hidden"
-                name="id"
-                label="Id"
-                size="small"
-                onChange={handleChange}
-                value={formData.id}
-                style={{ display: 'none' }}
-              />
+          <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
               <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <Autocomplete
-                    options={merchants}
-                    getOptionLabel={(merchant) => merchant.name}
-                    value={merchants.find((merchant) => merchant.users_id === formData.merchant_id) || null}
-                    onChange={(event, newValue) => {
-                    handleChange({
-                    target: {
-                    name: 'merchant_id',
-                    value: newValue ? newValue.users_id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
-                    renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Merchant Name"
-                      required
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Method</InputLabel>
+                    <Select
+                      name="method"
+                      onChange={handleChange}
+                      value={formData.method}
+                    >
+                      <MenuItem value="GET">GET</MenuItem>
+                      <MenuItem value="Post">Post</MenuItem>
+                      <MenuItem value="PUT">PUT</MenuItem>
+                      <MenuItem value="Delete">Delete</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>    
+
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField fullWidth
                     type="text"
@@ -252,47 +242,88 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
-            
-               
-
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-                  <FormControl size="small" fullWidth>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                      name="status"
-                      onChange={handleChange}
-                      value={formData.status}
-                    >
-                      <MenuItem value="Active">Active</MenuItem>
-                      <MenuItem value="Deactive">Deactive</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField fullWidth
                     type="text"
-                    name="webhook_url"
-                    label="Webhook Url"
+                    name="menu_name"
+                    label="Menu Name"
                     size="small"
                     onChange={handleChange}
-                    value={formData.webhook_url}
+                    value={formData.menu_name}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
-                  
                 </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="text"
+                    name="url"
+                    label="URL"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.url}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField fullWidth
+                    type="number"
+                    name="arrange"
+                    label="Arrange"
+                    size="small"
+                    onChange={handleChange}
+                    value={formData.arrange}
+                    validators={["required"]}
+                    errorMessages={["this field is required"]}
+                  />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Header</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={header} onChange={setHeader}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Request</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={request} onChange={setRequest}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Response</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={response} onChange={setResponse}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Description</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={description} onChange={setDescription}  theme="snow" />
+                </Grid>
+                
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Details</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={details} onChange={setDetails}  theme="snow" />
+                </Grid>
+
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Example</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                 value={example} onChange={setExample}  theme="snow" />
+                </Grid>
+         
               </Grid>
-              <Button
-                style={{ marginTop: 60 }}
-                color="primary"
-                variant="contained"
-                type="submit"
-                size="small"
-              >
+
+              <Button  style={{ marginTop: 60 }} color="primary" variant="contained"
+                type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
               </Button>
             </ValidatorForm>
+
           </Typography>
         </Box>
       </Modal>
@@ -300,4 +331,4 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default MerchantkeyslistEdit;
+export default ApiDocEdit;

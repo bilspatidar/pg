@@ -217,7 +217,7 @@ function ContactUs({ handleClose, open, editedItem }) {
         }
 
         <Stack spacing={3}>
-          <SimpleCard title="About Form">
+          <SimpleCard title="Contact Us Form">
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
               <TextField

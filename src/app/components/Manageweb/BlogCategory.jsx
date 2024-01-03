@@ -484,7 +484,7 @@ const handleFilterFormSubmit = async (e) => {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Blog Category Table">
+        <SimpleCard title="Blog Category List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

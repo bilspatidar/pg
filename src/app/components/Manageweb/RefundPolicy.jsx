@@ -206,7 +206,7 @@ function RefundPolicy({ handleClose, open, editedItem }) {
         }
 
         <Stack spacing={3}>
-          <SimpleCard title="About Form">
+          <SimpleCard title="Refund Policy Form">
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
               <TextField

@@ -10,17 +10,18 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
-
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: '80%',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   p: 4,
+  overflow:'scroll',
+  height: "90%"
 };
 
 function CurrencyEdit({ handleClose, open, editedItem }) {

@@ -334,7 +334,7 @@ function Transactionlist() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       
       <Container>
-        <SimpleCard title="Payment Gateway Table">
+        <SimpleCard title="Transaction List ">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
    

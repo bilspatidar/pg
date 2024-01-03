@@ -403,7 +403,7 @@ const handleFileChange = (e) => {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Categories Form">
+          <SimpleCard title="Category Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -461,7 +461,7 @@ const handleFileChange = (e) => {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Categories Table">
+        <SimpleCard title="Categories List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

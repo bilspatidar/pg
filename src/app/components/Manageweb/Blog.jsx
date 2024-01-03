@@ -521,7 +521,7 @@ function Blog() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Blog Table">
+        <SimpleCard title="Blog List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

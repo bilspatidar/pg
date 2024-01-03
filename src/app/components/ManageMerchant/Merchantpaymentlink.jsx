@@ -71,7 +71,7 @@ const StyledTable = styled(Table)`
   th,
   td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 6px;
     text-align: left;
   }
 
@@ -731,7 +731,7 @@ function Merchantpaymentlink() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Payment Gateway Table">
+        <SimpleCard title="Payment Gateway List">
           <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
@@ -926,7 +926,7 @@ function Merchantpaymentlink() {
 
             </Button>
 
-            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
+            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 900 }} aria-label="caption table" >
 
               <TableHead>
 
