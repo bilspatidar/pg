@@ -14,6 +14,7 @@ import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
 import useAuth from 'app/hooks/useAuth';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 import ReactQuill from 'react-quill';
+import { Editor } from 'material-jsoneditor';
 import 'react-quill/dist/quill.snow.css';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -40,6 +41,12 @@ import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import ApiDocEdit from './ApiDocEdit';
+import AceEditor from "react-ace";
+
+import "ace-builds/src-noconflict/mode-java";
+import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/ext-language_tools";
+
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -507,7 +514,7 @@ function ApiDoc() {
                     onChange={handleChange}
                     value={formData.url}
                     validators={["required"]}
-                    errorMessages={["this field is required"]}
+                    // errorMessages={["this field is required"]}
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
@@ -525,20 +532,44 @@ function ApiDoc() {
 
                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
                 <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Header</Typography>
-                <ReactQuill fullWidth style={{ height:"100px"}} 
-                value={header} onChange={setHeader}  theme="snow" />
+                <AceEditor 
+                    mode="java"
+                    theme="github"
+                    onChange={setHeader}
+                    value={header}
+                    name="header"
+                    style={{ height:"100px"}}
+                    editorProps={{ $blockScrolling: true }}
+  />
+               
+               
                 </Grid>
 
-                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
                 <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Request</Typography>
-                <ReactQuill fullWidth style={{ height:"100px"}} 
-                value={request} onChange={setRequest}  theme="snow" />
+                <AceEditor fullWidth
+                mode="java"
+                theme="github"
+                onChange={setRequest}
+                value={request}
+                name="request"
+                style={{ height:"100px"}}
+                editorProps={{ $blockScrolling: true }}
+                   />           
                 </Grid>
 
-                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 1 }}>
                 <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Response</Typography>
-                <ReactQuill fullWidth style={{ height:"100px"}} 
-                value={response} onChange={setResponse}  theme="snow" />
+                <AceEditor fullWidth
+                 mode="java"
+                 theme="github"
+                 onChange={setResponse}
+                 value={response}
+                 name="response"
+                 style={{ height:"100px"}}
+                 editorProps={{ $blockScrolling: true }}
+                  />
+                
                 </Grid>
 
                 <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 3 }}>

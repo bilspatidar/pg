@@ -11,7 +11,6 @@ import {BASE_URL} from './config';
 
 const App = () => {
 //   const [data, setData] = useState([]);
-//  // mouse side m krlo or beech  m nategiri mt kro ok ye shi h ab jha jha api call ho rhi h wha wha p  bs base_url esa likhna h url ki jghtum kro ek me kese kya
 //   useEffect(() => {
 //     fetch(`${BASE_URL}/endpoint`)
 //       .then(response => response.json())

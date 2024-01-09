@@ -5,7 +5,8 @@ import StorefrontIcon from '@mui/icons-material/Storefront';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 
 export const navigations = [
-  { name: 'Super Admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+  // { name: 'Super Admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+  { name: 'Super Admin Dashboard', path: '/Dasboard/Dasboard', icon: 'dashboard' },
   // {
   //   name: 'Session/Auth',
   //   icon: 'security',
@@ -98,7 +99,7 @@ export const navigations = [
 
       { name: 'Transaction', path: '/Report/transaction_list', iconText: 'T' },
     
-
+     
     ]
   },
   {
@@ -131,4 +132,5 @@ export const navigations = [
   //   type: 'extLink',
   //   path: 'http://demos.ui-lib.com/matx-react-doc/'
   // }
+ 
 ];

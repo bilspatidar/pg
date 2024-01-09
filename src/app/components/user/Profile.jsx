@@ -35,6 +35,8 @@ import {
 import CustomSnackbar from '../CustomSnackbar';
 
 import { Link } from 'react-router-dom';
+
+
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -56,6 +58,10 @@ const Small = styled('small')(({ bgcolor }) => ({
 
 
 const useStyles = makeStyles((theme) => ({
+  profilePic: {
+    width: theme.spacing(40), // Set your desired size
+    height: theme.spacing(18),
+  },
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
@@ -348,14 +354,14 @@ function Profile(handleClose, open, editedItem) {
             <div className="card-body no-padding height-9">
            
             <div className="row">
-  <div className="profile-userpic">
-
-      <img src={formData.profile_pic} className="img-responsive" alt="Profile Picture" />
-   
-      
-   
-  </div>
-</div>
+      <div className="profile-userpic">
+        <Avatar
+          alt="Profile Picture"
+          src={usersDetails.profile_pic}
+          className={classes.profilePic}
+        />
+      </div>
+    </div>
               <div className="profile-usertitle">
                 <div className="profile-usertitle-name">{usersDetails.name}</div>
                 <div className="profile-usertitle-job"><h3>{usersDetails.company_name}</h3></div>

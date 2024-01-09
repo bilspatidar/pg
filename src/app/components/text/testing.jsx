@@ -1,545 +1,237 @@
-import React, { useRef,JWTAuthContext } from 'react'
-import {BASE_URL} from './../../config';
-import { Stack } from '@mui/material';
-import { Box, styled } from '@mui/material';
-import { Breadcrumb, SimpleCard } from 'app/components';
-import ModeTwoToneIcon from '@mui/icons-material/ModeTwoTone';
-import  Dialog  from "../Dialog";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import '../Style.css';
-import CustomSnackbar from '../CustomSnackbar';
-import Loading from "../MatxLoading";
-import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
-import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
-
-import {
-  Button,
-  InputLabel ,
-  MenuItem, 
-  Grid,
-  Icon,
-  TablePagination,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  IconButton,
-  FormControl,
-  Select,
-
- 
-} from "@mui/material";
-import { Span } from "app/components/Typography";
-import { useEffect, useState } from "react";
-
-import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import CategoryEdit from './CategoryEdit';
-
-const TextField = styled(TextValidator)(() => ({
-    width: "100%",
-   
-  }));
-  const Container = styled('div')(({ theme }) => ({
-    margin: '30px',
-    [theme.breakpoints.down('sm')]: { margin: '16px' },
-    '& .breadcrumb': {
-      marginBottom: '30px',
-      [theme.breakpoints.down('sm')]: { marginBottom: '16px' }
+<style>
+    .textArea{
+        margin-left:40px !important;
     }
-  }));
-  
-const Small = styled('small')(({ bgcolor }) => ({
-  width: 50,
-  height: 15,
-  color: '#fff',
-  padding: '2px 8px',
-  borderRadius: '4px',
-  overflow: 'hidden',
-  background: bgcolor,
-  boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
-}));
-  
-  const StyledTable = styled(Table)(({ theme }) => ({
-    whiteSpace: "pre",
-    "& thead": {
-      "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } },
-    },
-    "& tbody": {
-      "& tr": { "& TableCell": { paddingLeft: 0, textTransform: "capitalize" } },
-    },
-  }));
-
-function Category () {
-  const token = localStorage.getItem('accessToken');
-  const [apiResponse, setApiResponse] = useState(null);
-  const [errorMsg, setErrorMsg] = useState([]);
-
-
-  const handlePrint = () => {
-    if (tableRef.current) {
-      const printWindow = window.open('', '', 'width=1000,height=1000');
-      printWindow.document.open();
-      printWindow.document.write('<html><head><title>Print</title></head><body>');
-      printWindow.document.write('<table>' + tableRef.current.innerHTML + '</table>');
-      printWindow.document.write('</body></html>');
-      printWindow.document.close();
-      printWindow.print();
-      printWindow.close();
-    }
-  };
-  const [open, setOpen] = React.useState(false);
-  const [editedItem, setEditedItem] = React.useState("");
-  const [deletedItemId, setDeletedItemId] = React.useState();
-
-  const tableRef = useRef(null);
-
-
-    const [formData, setFormData] = useState({
-      name: '',
-      status: '',      
-      image:'',
-      });
-    const [tableData, setTableData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    
-    const [imageData, setImageData] = useState('');
-
-    
-    
-      
-      //Get Data from API 
-      async function geTableCellata() {
-        
-        const endpoint = ${BASE_URL}/category/index;
-    
-        try {
-          const res = await fetch(endpoint,{
-            method: "get",
-            headers: new Headers({
-              "ngrok-skip-browser-warning": true,
-              "token": token
-            }),  
-          });
-          
-         const data = await res.json();
-          setTableData(data.data);
-          if(res.status !== 401){
-            setTableData(data.data); // Set the fetched data to the local state variable
-          }
-        
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-        setLoading(false);
-      }
-    
-      const handleChange = (e) => {
-        // file type m value nhi hoti h wait sochne do conditon lgegi yha
-        const {name, value} = e.target;
-        setFormData({
-          ...formData,
-          [name]: value
-        })
-      }
-    
-      
-      const handleSubmit = async (e) => {
-        e.preventDefault();
-         setLoading(true);
-        const endpoint = ${BASE_URL}/category/create;
-       let em = [];
-       
-       
-        try {
-          const data = {
-            name: formData.name,
-            status: formData.status,
-            image: imageData,
-          };
-      
-          const res = await fetch(endpoint, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: new Headers({
-              "ngrok-skip-browser-warning": true,
-              "token": token,
-              'Content-Type': 'application/json'
-            }),
-          });
-          
-
-          if (res.status === 200) {
-            const responseData = await res.json();
-             geTableCellata();
-            ///toast.success(responseData.message);
-            console.log(responseData.message)
-            setFormData(
-              {
-                name: '',
-                status: '',
-                image: '',
-              
-                }
-            )
-            let obj = {bgType: "success", message:${responseData.message}};
-
-            em.push(obj);
-          } else {
-  
-           
-            const errorData = await res.json();
-            //toast(errorData.message);
-            let obj = {bgType: "error", message:${errorData.message}};
-
-            em.push(obj);
-            // bgtype = 'error';
-           if (errorData.error) { 
-              for (const key in errorData.error) {
-                if (errorData.error.hasOwnProperty(key)) {
-                  const errorMessages = errorData.error[key].join(', '); // Combine multiple error messages if any
-                  //toast.error(${key}: ${errorMessages});
-                  let obj = {bgType: "error", message: ${key}: ${errorMessages}};
-                  // em.push(${key}: ${errorMessages});
-                  em.push(obj);
-                 
-
-                }
-              }
-              console.log(em)
-             
-              console.log(errorMsg)
-              
-            }
-          
-          }
-        } catch (error) {
-          console.log(error)
-          let obj = {bgType: "error", message:${error.message}};
-
-           em.push(obj);
-
-        }
-        setErrorMsg(em)
-        setLoading(false);
-      };
-      
-
-      const handleFileChange = (e) => {
-        handleFileInputChange(e,setImageData);
-      };
-
-      useEffect(() => {
-        geTableCellata();
-     }, []);
-
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-  
-    const handleChangePage = (_, newPage) => {
-      setPage(newPage);
-    };
-  
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(+event.target.value);
-      setPage(0);
-    };
-
-  
-    const handleOpen = (item) => {
-      setEditedItem(item)
-      setOpen(true);
-    }
-    
-    const handleClose = () => 
-    {
-      geTableCellata();
-      setOpen(false);
-    }
-
-    
-const [openDeleteModal, setOpenDeleteModal] = React.useState(false);
-
-  const handleDeleteModalOpen = (id) => {
-    setDeletedItemId(id)
-    setOpenDeleteModal(true);
-  };
-
-  const handleDeleteModalClose = () => {
-    setOpenDeleteModal(false);
-
-  };
- 
-  const deleteItem = async () => {
-    const token = localStorage.getItem('accessToken');
-
-    const endpoint = ${BASE_URL}/category/destroy;
-    try {
-      const data = {
-        id: deletedItemId,
-      };
-  
-      const res = await fetch(endpoint, {
-        method: "DELETE",
-        body: JSON.stringify(data),
-        headers: new Headers({
-          "ngrok-skip-browser-warning": true,
-          "token": token,
-          'Content-Type': 'application/json'
-        }),
-      });
-      console.log(res)
-      if(res.status === 200){
-        geTableCellata()
-      }
-    } catch (error) {
-      console.log(error)
-
-    }
-    handleDeleteModalClose()
-  }
-
-    
-  return (
-    <>
-     <div className='componentLoader'>  { loading? ( <Loading /> ) : ( "" ) } </div>
-        <Container>
-        <Box className="breadcrumb">
-        <Breadcrumb routeSegments={[{ name: 'Category', path: '/master/category' }, { name: 'Form' }]} />
-      </Box>
-      {
-        errorMsg && errorMsg.length > 0 && errorMsg.map((error, index)=>(
-          <div key={index}>
-        <CustomSnackbar
-        message={
-          <ul> 
-            {errorMsg.map((error, index) => (
-              <li key={index} className={index === 0 ? 'first-li-error-msg' : 'li-error-msg'}>{error.message} </li>
-            ))}
-          </ul>
-        }
-        severity={ errorMsg[0].bgType }
-        autoHideDuration={4000}
-        onClose={() => setErrorMsg([])}
-      />
-</div>
-        ))
-      }
-      
-      <Stack spacing={3}>
-        <SimpleCard title="Category Form">
-
-
-    <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-        <Grid container spacing={3}>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-            <TextField
-              type="text"
-              name="name"
-              label="Name"
-              size="small"
-              onChange={handleChange}
-              value={formData.name} 
-              validators={["required"]}
-              errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-          <TextField
-              type="file"
-              name="image"
-              label="Image"
-              size="small"
-              onChange={handleFileChange}
-         
-              // validators={["required"]}
-              // errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-      <FormControl size="small" fullWidth>
-        <InputLabel>Status</InputLabel>
-        <Select
-          name="status"
-          onChange={handleChange}
-          value={formData.status}
-          required
-        >
-          <MenuItem value="active">Active</MenuItem> 
-          <MenuItem value="deactive">Deactive</MenuItem> 
-        </Select>
-      </FormControl>
-    </Grid>
-
-        </Grid>
-
-        <Button style={{marginTop: 30}} color="primary" variant="contained" type="submit">
-          <Icon>send</Icon>
-          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
-        </Button>
-      </ValidatorForm>
-
-      </SimpleCard>
-      </Stack>
-      </Container>
-
-
-      <Container>
-      <SimpleCard title="Category Table">
-      <ValidatorForm  className="filterForm">
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
-          <TextField
-            id="filterTwo"
-            label="Booking No"
-            variant="outlined"
-            size="small"
-            fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            id="filterFour"
-            label="From Date"
-            type="date"
-            variant="outlined"
-            size="small"
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <TextField
-            id="filterFive"
-            label="To Date"
-            type="date"
-            variant="outlined"
-            size="small"
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} md={2}>
-        <Button color="primary" variant="contained" type="submit">
-          <Icon>send</Icon>
-          <Span sx={{ pl: 1, textTransform: "capitalize" }}>Search</Span>
-        </Button>
-        </Grid>
-      </Grid>
-    </ValidatorForm >
-      <Box width="100%" overflow="auto"mt={2}>
-      <Button
-         
-         variant="contained"
-         // color="primary"
-         onClick={()=>handlePrint()}
-         style={{
-           backgroundColor: '#2A0604', // Set the desired darker color
-           color: 'white', 
-           height:30,
-         }}
-       >
-         Print
-         
-       </Button>
-     
-       <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
-     
-     <TableHead>
-    
-       <TableRow>
-         <TableCell align="left">Sr no.</TableCell>
-         <TableCell align="center">Name</TableCell>
-         <TableCell align="center">image</TableCell>
-         <TableCell align="center">Status</TableCell>
-         <TableCell align="right">Option</TableCell>
-         
-       </TableRow>
-     </TableHead>
-
-     <TableBody>
-       {tableData?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-         .map((item, index) => (
-           <TableRow key={index}>
-             <TableCell align="left">{index + 1}</TableCell>
-             <TableCell align="center">{item.name}</TableCell>
-             <TableCell align="center">
-        {item.image ? (
-          <a href={item.image} target="_blank" rel="noopener noreferrer">
-            <img
-              style={{ height: '50px', width: '50px' }}
-              src={item.image}
-              alt="Item Image"
-            />
-          </a>
-        ) : (
-          <span>No Image Available</span>
-        )}
-      </TableCell>
-            
-      <TableCell align="center">
-  <Small className={item.status === 'active' ? 'green_status' : 'red_status'
-  }>
-    {item.status}
-  </Small>
-</TableCell>
-             <TableCell align="right">
-             
-           
-             <ModeTwoToneIcon  fontSize="small" style={{ color: '#173853' }} 
-             onClick={() => handleOpen(item)}>
-<Icon>edit</Icon>
-</ModeTwoToneIcon>
-           <CategoryEdit editedItem={editedItem} handleClose={handleClose} open={open} />
-           <DeleteOutlineTwoToneIcon onClick={()=>handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
-<Icon>delete</Icon>
-</DeleteOutlineTwoToneIcon>
-           <Dialog actionButtonhandler={deleteItem} open={openDeleteModal} handleClose={handleDeleteModalClose} />
-             </TableCell>
-             
-           </TableRow>
-         ))}
-     </TableBody>
-
-   </StyledTable>
-
-
-      <TablePagination
-        sx={{ px: 2 }}
-        page={page}
-        component="div"
-        rowsPerPage={rowsPerPage}
-        count={tableData.length}
-        onPageChange={handleChangePage}
-        rowsPerPageOptions={[5, 10, 25]}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        nextIconButtonProps={{ "aria-label": "Next Page" }}
-        backIconButtonProps={{ "aria-label": "Previous Page" }}
-      />
-    </Box>
-    </SimpleCard> 
-    </Container>
-    <ToastContainer
-            style={{ minWidth: "360px", width: "auto", maxWidth: "500px" }}
-            position="top-center"
-            autoClose={3000}
-            hideProgressBar={true}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-            color="red"
-        />
-    </>
-  )
+	.url {
+    font-size: 15px;
+    text-align: left;
+    padding: 15px 15px;
+    border-radius: 3px;
+    font-family: 'Roboto Mono';
+	color:#222;
 }
 
-export default Category;
+div.card .card-header-primary {
+    background: linear-gradient(60deg,#ab47bc,#7b1fa2);
+    box-shadow: 0 5px 20px 0 rgba(0,0,0,.2), 0 13px 24px -11px rgba(156,39,176,.6);
+}
+
+div.card .card-header-danger {
+    background: linear-gradient(60deg,#FF31FA,#6C73FF);
+    box-shadow: 0 5px 20px 0 rgba(0,0,0,.2), 0 13px 24px -11px rgba(244,67,54,.6);
+}
+
+
+.card-nav-tabs .card-header {
+   /* margin-top: -30px!important;*/
+}
+
+.card .card-header .nav-tabs {
+    padding: 0;
+}
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 0;
+    margin-bottom: 0;
+    list-style: none;
+}
+
+.nav-tabs .nav-item {
+    margin-bottom: -1px;
+}
+
+.nav-tabs .nav-item .nav-link.active {
+    background-color: hsla(0,0%,100%,.2);
+    transition: background-color .3s .2s;
+}
+
+.nav-tabs .nav-item .nav-link{
+    border: 0!important;
+    color: #fff!important;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-item .nav-link {
+    color: #fff;
+    border: 0;
+    margin: 0;
+    border-radius: 3px;
+    line-height: 24px;
+    text-transform: uppercase;
+    font-size: 12px;
+    padding: 10px 15px;
+    background-color: transparent;
+    transition: background-color .3s 0s;
+}
+
+.nav-link{
+    display: block;
+}
+
+.nav-tabs .nav-item .material-icons {
+    margin: -1px 5px 0 0;
+    vertical-align: middle;
+}
+
+.nav .nav-item {
+    position: relative;
+}
+</style>
+<div class="container-fluid">
+
+<div class="row">
+     <div class="col-md-12 text-center" >
+       <h2><?php echo $api[0]->tittle;?></h2> 
+    </div>
+</div>
+<hr/>
+<?php if(!empty($api[0]->description)){ ?>
+<div class="row mt-4">
+	<div class="col-md-12 m-2" style="text-align:justify"><?php echo $api[0]->description;?></div>
+</div>
+<?php } ?>
+<?php if(!empty($api[0]->method) && !empty($api[0]->url)){ ?>
+<div class="row ">
+	<div class="col-md-12">
+	<div class="card card-nav-tabs">
+			<div class="card-header card-header-primary">
+				<!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+				<div class="nav-tabs-navigation">
+					<div class="nav-tabs-wrapper">
+						<ul class="nav nav-tabs" data-tabs="tabs">
+							<li class="nav-item">
+								<button class="nav-link active" data-bs-target="#requestUrl" data-bs-toggle="tab">Requested Url</button>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="card-body ">
+				<div class="tab-content">
+					<div class="tab-pane active" id="requestUrl">
+					<div align="right"><button class="btn btn-sm btn-primary pull-right" onclick="CopyToClipboard('url')" ><span class="fa fa-copy"></span></button></div>
+						<div id="url">
+						<?php if($api[0]->method=="Get"){
+								$color = "primary";
+							}elseif($api[0]->method=="Post"){
+								$color = "success";
+							}?>
+						<span class="badge bg-<?=$color?>"><?php echo $api[0]->method;?></span><span class="url"><?php echo $api[0]->url;?></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<?php } ?>
+<?php if(!empty($api[0]->header)){ ?>
+<div class="row mt-4">
+	<div class="col-md-12">
+	<div class="card card-nav-tabs">
+			<div class="card-header card-header-danger">
+				<!-- colors: "header-primary", "header-info", "header-success", "header-warning", "header-danger" -->
+				<div class="nav-tabs-navigation">
+					<div class="nav-tabs-wrapper">
+						<ul class="nav nav-tabs" data-tabs="tabs">
+						<?php if(!empty($api[0]->header)){ ?>
+							<li class="nav-item">
+								<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#header">Header</button>
+							</li>
+						<?php } ?>
+						<?php if(!empty($api[0]->request)){ ?>
+							<li class="nav-item">
+								<button class="nav-link " data-bs-toggle="tab" data-bs-target="#request">Request</button>
+							</li>
+						<?php } ?>
+						<?php if(!empty($api[0]->response)){ ?>
+							<li class="nav-item">
+								<button class="nav-link" data-bs-toggle="tab" data-bs-target="#response">Response</button>
+							</li>
+						<?php } ?>
+						<?php if(!empty($api[0]->example)){ ?>
+							<li class="nav-item">
+								<button class="nav-link" data-bs-toggle="tab" data-bs-target="#example">Example</button>
+							</li>
+						<?php } ?>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="card-body ">
+				<div class="tab-content">
+					<div class="tab-pane fade  show active" id="header">
+						<div class=" m-2 textArea" id="head"><?php echo $api[0]->header;?></div>
+					</div>
+					<div class="tab-pane fade" id="request">
+						<div class=" m-2 textArea" id="req"><?php echo $api[0]->request;?></div>
+					</div>
+					<div class="tab-pane fade" id="response">
+						<div class=" m-2 textArea" id="res"><?php echo $api[0]->response;?></div>
+					</div>
+					<div class="tab-pane fade bg-dark" id="example">
+						<div align="right"><button class="btn btn-sm btn-primary pull-right" onclick="CopyToClipboard('exe')"><span class="fa fa-copy"></span></button></div>
+						<div class=" m-2 textArea" id="exe"><?php echo $api[0]->example;?></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	<!--
+		<div class="card">
+            <div class="card-body pt-3">
+				<ul class="nav nav-tabs nav-tabs-bordered">
+                <li class="nav-item">
+					<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#header">Header</button>
+                </li>
+                <li class="nav-item">
+					<button class="nav-link " data-bs-toggle="tab" data-bs-target="#request">Request</button>
+                </li>
+                <li class="nav-item">
+					<button class="nav-link" data-bs-toggle="tab" data-bs-target="#response">Response</button>
+                </li>
+				</ul>
+				<div class="tab-content pt-2">
+					<div class="tab-pane fade  show active" id="header">
+						<div align="right"><button class="btn btn-sm btn-primary pull-right" onclick="CopyToClipboard('head')"><span class="fa fa-copy"></span></button></div>
+						<div class=" m-2 textArea" id="head"><?php echo $api[0]->header;?></div>
+					</div>
+					<div class="tab-pane fade" id="request">
+						<div align="right"><button class="btn btn-sm btn-primary pull-right" onclick="CopyToClipboard('req')"><span class="fa fa-copy"></span></button></div>
+						<div class=" m-2 textArea" id="req"><?php echo $api[0]->request;?></div>
+					</div>
+					<div class="tab-pane fade" id="response">
+						<div align="right"><button class="btn btn-sm btn-primary pull-right" onclick="CopyToClipboard('res')"><span class="fa fa-copy"></span></button></div>
+						<div class=" m-2 textArea" id="res"><?php echo $api[0]->response;?></div>
+					</div>
+				</div>
+			</div>
+		</div> -->
+	</div>
+</div>
+<?php } ?>
+<?php if(!empty($api[0]->details)){ ?>
+<div class="row mt-4">
+	<div class="col-md-12 m-2" style="text-align:justify"><?php echo $api[0]->details;?></div>
+</div>
+<?php } ?>
+</div>
+<script type="text/javascript">
+function setHeight(fieldId){
+    document.getElementById(fieldId).style.height = document.getElementById(fieldId).scrollHeight+'px';
+}
+setHeight('textBox1');
+setHeight('textBox2');
+setHeight('textBox3');
+setHeight('textBox4');
+
+function CopyToClipboard(id)
+{
+var r = document.createRange();
+r.selectNode(document.getElementById(id));
+window.getSelection().removeAllRanges();
+window.getSelection().addRange(r);
+document.execCommand('copy');
+window.getSelection().removeAllRanges();
+}
+</script>

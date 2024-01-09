@@ -167,9 +167,23 @@ const Layout1Topbar = () => {
 
           <MatxMenu
             menuButton={
+              
               <UserMenu>
+               <div className="profile-userpic">
+
+<img
+src={userData.profile_pic}
+className="img-responsive"
+alt="Profile Picture"
+style={{ height: '30px', width: '40px' }} // Set your preferred height and width
+/>
+
+
+</div>
                 <Hidden xsDown>
+                
                   <Span>
+                    
                     <strong>{userData.name}</strong>
                   </Span>
                 </Hidden>
