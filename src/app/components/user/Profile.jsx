@@ -166,6 +166,7 @@ function Profile(handleClose, open, editedItem) {
 
   const [errorMsg, setErrorMsg] = useState([]);
   const [imageData, setImageData] = useState('');
+  const [newImageSelected, setNewImageSelected] = useState(false); 
 
   const [formData, setFormData] = useState({
     name: '',
@@ -188,12 +189,16 @@ function Profile(handleClose, open, editedItem) {
     })
   }
   const handleFileChange = (e) => {
+    const file = e.target.files[0];
 
-
-    handleFileInputChange(e, setImageData);
-
+    if (file) {
+      handleFileInputChange(e, setImageData);
+      setNewImageSelected(true); // Set the flag when a new image is selected
+    } else {
+      setImageData('');
+      setNewImageSelected(false); // Reset the flag when no file is selected
+    }
   };
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -211,7 +216,7 @@ function Profile(handleClose, open, editedItem) {
         company_name: formData.company_name,
         address: formData.address,
         status: formData.status,
-        profile_pic: imageData,
+        profile_pic: newImageSelected ? imageData : null, 
       };
 
       const res = await fetch(endpoint, {
@@ -298,6 +303,7 @@ function Profile(handleClose, open, editedItem) {
         mobile: data[0].mobile,
         company_name: data[0].company_name,
         address: data[0].address,
+     
         imageData: data[0].profile_pic,
         status: data[0].status,
       })

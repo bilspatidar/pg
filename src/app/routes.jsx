@@ -34,6 +34,9 @@ import Managepassword from './components/user/Managepassword';
 import Payment_gateway from './components/PaymentGateway/Payment_gateway';
 import Documentation from './components/Documentation/Documentation';
 import Dasboard from '.././app/views/dashboard/Dasboard';
+import MemberProfile from './components/Member/MemberProfile';
+import Ticket from './components/ManageTicket/Ticket';
+import TicketTag from './components/ManageTicket/TicketTag';
 
 
 // session pages
@@ -87,6 +90,7 @@ const routes = [
       { path: '/Manageweb/Blog', element: <Blog /> },
       { path: '/Manageweb/Services', element: <Services /> },
       { path: '/Manageweb/About', element: <About /> },
+
       { path: '/Manageweb/TermsCondition', element: <TermsCondition /> },
       { path: '/Manageweb/PrivacyPolicies', element: <PrivacyPolicies /> },
       { path: '/Manageweb/RefundPolicy', element: <RefundPolicy /> },
@@ -97,6 +101,11 @@ const routes = [
       { path: '/Report/transaction_list', element: <Transactionlist /> },
       { path: '/ManageApiDoc/ApiDoc', element: <ApiDoc /> },
       { path: '/Dasboard/Dasboard', element: <Dasboard /> },
+      { path: '/Member/MemberProfile', element: <MemberProfile /> },
+
+      
+      { path: '/ManageTicket/Ticket', element: <Ticket /> },
+      { path: '/ManageTicket/TicketTag/:ticketId', element: <TicketTag /> },
    
     ]
   },

@@ -926,7 +926,7 @@ function Merchantpaymentlink() {
 
             </Button>
 
-            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 900 }} aria-label="caption table" >
+            <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 1200 }} aria-label="caption table" >
 
               <TableHead>
 
@@ -983,7 +983,7 @@ function Merchantpaymentlink() {
             </StyledTable>
 
             <TablePagination
-              sx={{ px: 2 }}
+               sx={{ px: 2, minWidth: 1200 }}
               page={page}
               component="div"
               rowsPerPage={rowsPerPage}

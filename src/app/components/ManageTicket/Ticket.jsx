@@ -11,7 +11,10 @@ import '../Style.css';
 import CustomSnackbar from '../CustomSnackbar';
 import Loading from "../MatxLoading";
 import DeleteOutlineTwoToneIcon from '@mui/icons-material/DeleteOutlineTwoTone';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import useAuth from 'app/hooks/useAuth';
+import { Link } from 'react-router-dom';
 import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
 
 import { useNavigate } from 'react-router-dom';
@@ -27,18 +30,17 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  IconButton,
   FormControl,
   Select,
   Autocomplete,
-
+  Typography,
 
 } from "@mui/material";
 import { Span } from "app/components/Typography";
 import { useEffect, useState } from "react";
 
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
-import MerchantkeyslistEdit from './MerchantkeyslistEdit';
+import TicketEdit from './TicketEdit';
 
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
@@ -63,6 +65,7 @@ const Small = styled('small')(({ bgcolor }) => ({
   background: bgcolor,
   boxShadow: '0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24)',
 }));
+
 const StyledTable = styled(Table)`
   width: 100%;
   margin-bottom: 20px;
@@ -79,16 +82,15 @@ const StyledTable = styled(Table)`
   }
 `;
 
-function Merchantkeyslist() {
+function Ticket() {
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
-  const [merchants, setMerchants] = useState([]);
-
   const { logout } = useAuth();
 
+
   const history = useNavigate();
-  
+
   const handlePrint = () => {
     if (tableRef.current) {
       const printWindow = window.open('', '', 'width=1000,height=1000');
@@ -131,21 +133,31 @@ function Merchantkeyslist() {
   };
   const [open, setOpen] = React.useState(false);
   const [editedItem, setEditedItem] = React.useState("");
+  const [TicketItemId, setTicketItemId] = React.useState("");
+  const [imageData, setImageData] = useState('');
+
   const [deletedItemId, setDeletedItemId] = React.useState();
+  const [merchants, setMerchants] = useState([]);
 
   const tableRef = useRef(null);
 
 
   const [formData, setFormData] = useState({
 
-            mid: '',
-            merchant_id: '',
-            webhook_url: '',
-           
+    title: '',
+    assign_id: '',
+    attachment: '',
+    user_id: '',
+    status: '',
+    details: '',
+
+
   });
   const [tableData, setTableData] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+  const [details, setDetails] = useState('');
+
+
   const fetchCategories = async () => {
     const endpoint = `${BASE_URL}/api/user/merchant_list`;
 
@@ -153,39 +165,31 @@ function Merchantkeyslist() {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: new Headers({
-        //   "ngrok-skip-browser-warning": true,
+          //   "ngrok-skip-browser-warning": true,
           "token": token
-        }),  
+        }),
       })
 
-      const {data} = await response.json();
+      const { data } = await response.json();
       setMerchants(data);
     } catch (error) {
       console.log(error)
     }
   }
+
   //Get Data from API 
-  //Get Data from API 
-  async function geTableCellata(mid, status,from_date,to_date,merchant_id) {
-    const endpoint = `${BASE_URL}/api/user/merchant_keys_list`;
-  
+  async function geTableCellata(title, status) {
+    const endpoint = `${BASE_URL}/api/ticket/ticket_list/`;
+
     try {
       const body = {};
-      if (mid) {
-        body.mid = mid;
+      if (title) {
+        body.title = title;
       }
       if (status) {
         body.status = status;
       }
-      if (from_date) {
-        body.from_date = from_date;
-      }
-      if (to_date) {
-        body.to_date = to_date;
-      }
-      if (merchant_id) {
-        body.merchant_id = merchant_id;
-      }
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: new Headers({
@@ -194,10 +198,12 @@ function Merchantkeyslist() {
         }),
         body: JSON.stringify(body)
       });
-  
+
       const data = await res.json();
       if (res.status !== 401) {
         setTableData(data.data);
+
+
       }
       if (res.status === 401 && data.message === "Token Time Expire.") {
         await logout();
@@ -209,12 +215,11 @@ function Merchantkeyslist() {
     setLoading(false);
   }
 
+
   const [filterFormData, setFilterFormData] = useState({
-    mid: '',
+    title: '',
     status: '',
-    from_date: '', 
-    to_date: '', 
-    merchant_id:''
+    // Add other fields related to the Filter Form here
   });
   const handleFilterFormChange = (e) => {
     const { name, value } = e.target;
@@ -226,36 +231,37 @@ function Merchantkeyslist() {
   const handleFilterFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { mid, status, from_date, to_date,merchant_id } = filterFormData; // Destructure from_date and to_date from filterFormData
-    await geTableCellata(mid, status, from_date, to_date,merchant_id);
+    const { title, status } = filterFormData;
+    await geTableCellata(title, status);
   };
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value)
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
+
     })
   }
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/user/merchant_keys/add`;
+    const endpoint = `${BASE_URL}/api/ticket/ticket/add`;
     let em = [];
 
-    console.log(formData.merchant_id);
+
     try {
       const data = {
-        mid: formData.mid,
-        merchant_id: formData.merchant_id, 
-        webhook_url: formData.webhook_url,
-     
-       
-       
-      }
+        title: formData.title,
+        assign_id: formData.assign_id,
+        user_id: formData.user_id,
+        details: details,
+        attachment: imageData,
+        status: formData.status,
+
+      };
       const res = await fetch(endpoint, {
         method: "POST",
         body: JSON.stringify(data),
@@ -274,13 +280,16 @@ function Merchantkeyslist() {
         console.log(responseData.message)
         setFormData(
           {
-            mid: '',
-            merchant_id: '',
-            webhook_url: '',
-           
+            title: '',
+            assign_id: '',
+            attachment: '',
+            status: '',
+            user_id: '',
+            details: '',
+
           }
         )
-      
+
         let obj = { bgType: "success", message: `${responseData.message}` };
 
         em.push(obj);
@@ -329,6 +338,10 @@ function Merchantkeyslist() {
     fetchCategories();
   }, []);
 
+  const handleFileChange = (e) => {
+    handleFileInputChange(e, setImageData);
+  };
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -343,7 +356,8 @@ function Merchantkeyslist() {
 
 
   const handleOpen = (item) => {
-    setEditedItem(item)
+    setEditedItem(item);
+
     setOpen(true);
   }
 
@@ -367,7 +381,7 @@ function Merchantkeyslist() {
 
   const deleteItem = async () => {
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/user/merchant_keys/${deletedItemId}`;
+    const endpoint = `${BASE_URL}/api/ticket/ticket/${deletedItemId}`;
     let em = [];
     try {
       const data = {
@@ -412,7 +426,7 @@ function Merchantkeyslist() {
       <div className='componentLoader'>  {loading ? (<Loading />) : ("")} </div>
       <Container>
         <Box className="breadcrumb">
-          <Breadcrumb routeSegments={[{ name: 'Merchant key ', path: '/ManageMerchant/Merchantkeyslist' },
+          <Breadcrumb routeSegments={[{ name: 'Ticket ', path: '/ManageTicket/Ticket' },
           { name: 'Form' }]} />
         </Box>
         {
@@ -434,64 +448,95 @@ function Merchantkeyslist() {
           ))
         }
 
+
         <Stack spacing={3}>
-          <SimpleCard title="Merchant Key Form">
-            <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
+          <SimpleCard title="Ticket Form">
+
+
+            <ValidatorForm onSubmit={handleSubmit} onError={() => null} data-form-identifier="add_form">
               <Grid container spacing={3}>
-              <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
-                
-              <Autocomplete
-              options={merchants}
-              getOptionLabel={(merchant) => merchant.name}
-              value={
-                merchants.find((merchant) => merchant.users_id === formData.merchant_id) ||
-                null
-              }
-              onChange={(event, newValue) => {
-                handleChange({  
-                  target: {
-                    name:'merchant_id',
-                    value: newValue ? newValue.users_id : '', // assuming id is a string or number
-                  },
-                });
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Merchant Name"
-                  required  // Add required attribute to validate
-                  fullWidth
-                  size="small"
-                />
-              )}
-            />
-            </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="mid"
-                    label="Mid"
+                    name="title"
+                    label="Title"
                     size="small"
                     onChange={handleChange}
-                    value={formData.mid}
+                    value={formData.title}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
                 </Grid>
-             
-          <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+
+                  <Autocomplete
+                    options={merchants}
+                    getOptionLabel={(merchant) => merchant.name}
+                    value={
+                      merchants.find((merchant) => merchant.users_id === formData.user_id) ||
+                      null
+                    }
+                    onChange={(event, newValue) => {
+                      handleChange({
+                        target: {
+                          name: 'user_id',
+                          value: newValue ? newValue.users_id : '', // assuming id is a string or number
+                        },
+                      });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Merchant Name"
+                        required  // Add required attribute to validate
+                        fullWidth
+                        size="small"
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
-                    type="text"
-                    name="webhook_url"
-                    label="Webhook Url"
+                    type="number"
+                    name="assign_id"
+                    label="Assign ID"
                     size="small"
                     onChange={handleChange}
-                    value={formData.webhook_url}
+                    value={formData.assign_id}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
-                  
                 </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <TextField
+                    type="file"
+                    name="attachment"
+                    label="Attachment "
+                    size="small"
+                    onChange={handleFileChange}
+                  />
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+                  <FormControl size="small" fullWidth>
+                    <InputLabel>Status</InputLabel>
+                    <Select
+                      name="status"
+                      onChange={handleChange}
+                      value={formData.status}
+                    >
+                      <MenuItem value="Open">Open</MenuItem>
+                      <MenuItem value="Assigned">Assigned</MenuItem>
+                      <MenuItem value="Closed">Closed</MenuItem>
+                      <MenuItem value="Reopen">Reopen</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 0 }}>
+                  <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>Details</Typography>
+                  <ReactQuill fullWidth style={{ height: "100px" }}
+                    value={details} onChange={setDetails} theme="snow" />
+                </Grid>
+
               </Grid>
 
               <Button disabled={loading} style={{ marginTop: 60 }} color="primary" variant="contained"
@@ -505,90 +550,38 @@ function Merchantkeyslist() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Merchant Key List">
-        <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
+        <SimpleCard title="Ticket List">
+          <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
-              <TextField
-    id="filterOne"
-    label="Mid"
-    variant="outlined"
-    size="small"
-    fullWidth
-    name="mid"
-    value={filterFormData.mid}
-    onChange={handleFilterFormChange}
-  />
-
+                <TextField
+                  id="filterOne"
+                  label="Title"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  name="title"
+                  value={filterFormData.title}
+                  onChange={handleFilterFormChange}
+                />
               </Grid>
+
+
               <Grid item xs={12} md={3}>
-                    <Autocomplete
-                    options={merchants}
-                    getOptionLabel={(merchant) => merchant.name}
-                    value={merchants.find((merchant) => merchant.users_id === filterFormData.merchant_id) || null}
-                    onChange={(event, newValue) => {
-                      handleFilterFormChange({
-                    target: {
-                    name: 'merchant_id',
-                    value: newValue ? newValue.users_id : '', // assuming id is a string or number
-                 },
-                   });
-                      }}
-                    renderInput={(params) => (
-                   <TextField
-                      {...params}
-                      label="Category Name"
-                    
-                     fullWidth
-                     size="small"
-                            />
-                 )}
-                   />
-            </Grid>       
-
-
-                <Grid item xs={12} md={3}>
                 <FormControl size="small" fullWidth>
-                    <InputLabel>Status</InputLabel>
-                    <Select
-                     id="filterTwo"
-                      name="status"
-                      onChange={handleFilterFormChange}
-                      value={filterFormData.status}
-                    >
-                      <MenuItem value="Active">Active</MenuItem>
-                      <MenuItem value="Deactive">Deactive</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-              <TextField
-    id="filterThree"
-    type="date"
-    label="From Date"
-    variant="outlined"
-    size="small"
-    fullWidth
-    name="from_date"
-    value={filterFormData.from_date}
-    onChange={handleFilterFormChange}
-  />
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    name="status"
+                    onChange={handleFilterFormChange}
+                    value={filterFormData.status}
+                  >
+                    <MenuItem value="Open">Open</MenuItem>
+                    <MenuItem value="Assigned">Assigned</MenuItem>
+                    <MenuItem value="Closed">Closed</MenuItem>
+                    <MenuItem value="Reopen">Reopen</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
-              <Grid item xs={12} md={3}>
-              <TextField
-    id="filterFour"
-    type="date"
-    label="To Date"
-    variant="outlined"
-    size="small"
-    fullWidth
-    name="to_date"
-    value={filterFormData.to_date}
-    onChange={handleFilterFormChange}
-  />
-              </Grid>
-            
               <Grid item xs={12} md={2}>
                 <Button color="primary" variant="contained" type="submit">
                   <Icon>send</Icon>
@@ -600,7 +593,6 @@ function Merchantkeyslist() {
 
           <Box width="100%" overflow="auto" mt={2}>
             <Button
-
               variant="contained"
               // color="primary"
               onClick={() => handlePrint()}
@@ -608,11 +600,10 @@ function Merchantkeyslist() {
                 backgroundColor: '#2A0604', // Set the desired darker color
                 color: 'white',
                 height: 30,
-                marginBottom: 10,
+                marginBottom: 10, // Corrected property name to add margin bottom
               }}
             >
               Print
-
             </Button>
 
             <StyledTable id="dataTable" ref={tableRef} sx={{ minWidth: 600 }} aria-label="caption table" >
@@ -621,12 +612,12 @@ function Merchantkeyslist() {
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center"> Mid</TableCell>
-                  <TableCell align="center">Merchant Name</TableCell>
-                  <TableCell align="center">Webhook Url</TableCell>
+                  <TableCell align="center"> Ticket ID</TableCell>
+                  <TableCell align="center"> Title</TableCell>
+                  <TableCell align="center"> Merchant Name </TableCell>
+                  <TableCell align="center"> Attachment</TableCell>
                   <TableCell align="center">Status</TableCell>
                   <TableCell align="right">Option</TableCell>
-                  
 
                 </TableRow>
               </TableHead>
@@ -636,26 +627,50 @@ function Merchantkeyslist() {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.mid}</TableCell>
-                      <TableCell align="center">{item.merchant_id}</TableCell>
-                      <TableCell align="center">{item.webhook_url}</TableCell>
-                      
-            
                       <TableCell align="center">
-                        <Small className={item.status === 'Active' ? 'green_status' : 'red_status'
-                        }>
+                        <Link
+                          to={`/ManageTicket/TicketTag/${item.id}`}
+                          style={{ color: 'blue' }}
+                        >
+                          {item.id}
+                        </Link>
+                      </TableCell>
+
+                      <TableCell align="center">{item.title}</TableCell>
+                      <TableCell align="center">{item.name}</TableCell>
+                      <TableCell align="center">
+                        {item.attachment ? (
+                          <a href={item.attachment} target="_blank" rel="noopener noreferrer">
+                            <img
+                              style={{ height: '50px', width: '50px' }}
+                              src={item.attachment}
+                              alt="Item Image"
+                            />
+                          </a>
+                        ) : (
+                          <span>No Image Available</span>
+                        )}
+                      </TableCell>
+
+
+                      <TableCell align="center">
+                        <Small className={item.status === 'Assigned' ? 'green_status' :
+                          item.status === 'Closed' ? 'red_status' :
+                            item.status === 'Reopen' ? 'yellow_status' :
+                              item.status === 'Open' ? 'blue_status' : ''
+
+                        }
+                        >
                           {item.status}
                         </Small>
                       </TableCell>
 
                       <TableCell align="right">
-
-
                         <ModeTwoToneIcon fontSize="small" style={{ color: '#173853' }}
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>
-                        <MerchantkeyslistEdit editedItem={editedItem} handleClose={handleClose} open={open} />
+                        <TicketEdit editedItem={editedItem} handleClose={handleClose} open={open} />
                         <DeleteOutlineTwoToneIcon onClick={() => handleDeleteModalOpen(item.id)} fontSize="small" style={{ color: '#ff0000' }}>
                           <Icon>delete</Icon>
                         </DeleteOutlineTwoToneIcon>
@@ -702,4 +717,4 @@ function Merchantkeyslist() {
   )
 }
 
-export default Merchantkeyslist;
+export default Ticket;

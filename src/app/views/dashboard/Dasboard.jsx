@@ -3,6 +3,7 @@ import { Breadcrumb, SimpleCard } from 'app/components';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import { Link } from 'react-router-dom';
 
 import DashbaordCard from './DashbaordCard';
 import React, { useRef, JWTAuthContext } from 'react'
@@ -189,7 +190,7 @@ const Dasboard = () => {
                 ]} />
             </Box>
 
-            <br />
+           
             <Container>
                 <SimpleCard title="">
 
@@ -340,7 +341,8 @@ const Dasboard = () => {
                                                 {tableData?.recentTransactions?.map((item, index) => (
                                                     <TableRow key={index}>
                                                         <TableCell align="left">{index + 1}</TableCell>
-                                                        <TableCell align="center">{item.merchant_name}</TableCell>
+                                                        {/* <Link to="/users/profile">{item.merchant_name}</Link> */}
+                                                        <TableCell align="center"><Link to="/Member/MemberProfile"style={{ color: 'blue' }}>{item.merchant_name}</Link></TableCell>
                                                         <TableCell align="center">{item.amount}</TableCell>
                                                         <TableCell align="center">{item.merchant_fee}</TableCell>
                                                         <TableCell align="center">{item.currency}</TableCell>

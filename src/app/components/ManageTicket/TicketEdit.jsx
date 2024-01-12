@@ -9,10 +9,11 @@ import { TextField, Grid, Select, MenuItem, Icon, FormControl, InputLabel, } fro
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { BASE_URL } from '../../config';
 import CustomSnackbar from '../CustomSnackbar';
-import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
-
 import Loading from "../MatxLoading";
-
+import handleFileInputChange from '../../helpers/helper'; // Adjust the import path
+import Autocomplete from '@mui/material/Autocomplete';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 const style = {
   position: 'absolute',
   top: '50%',
@@ -26,26 +27,25 @@ const style = {
   overflow:'scroll',
   height: "90%"
 };
-
-function CategoriesEdit({ handleClose, open, editedItem }) {
+function TicketEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem('accessToken');
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
   const [imageData, setImageData] = useState('');
+  const [details, setDetails] = useState('');
+  const [merchants, setMerchants] = useState([]);
   const [newImageSelected, setNewImageSelected] = useState(false); 
-
   const [formData, setFormData] = useState({
-    name: '',
-    shortName: '',
-    image: '',
+    title: '',
+    assign_id: '',
+    attachment: '',
+    user_id:'',
     status: '',
+    details: '',
   });
-  // const refreshTable = () => {
-  //   //setTableData(tableData);
-  //   tableData();
-  // }
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
 
@@ -57,6 +57,26 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
       setNewImageSelected(false); // Reset the flag when no file is selected
     }
   };
+
+
+  const fetchCategories = async () => {
+    const endpoint = `${BASE_URL}/api/user/merchant_list`;
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: new Headers({
+          //   "ngrok-skip-browser-warning": true,
+          "token": token
+        }),
+      })
+
+      const { data } = await response.json();
+      setMerchants(data);
+    } catch (error) {
+      console.log(error)
+    }
+  }
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -67,18 +87,21 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const endpoint = `${BASE_URL}/api/category/category/update`;
+    const endpoint = `${BASE_URL}/api/ticket/ticket/update`;
     let em = [];
 
 
     try {
       const data = {
         id: formData.id,
-       name: formData.name,
-        shortName: formData.shortName,
-        image: newImageSelected ? imageData : null, 
+        title: formData.title,
+        assign_id: formData.assign_id,
+        user_id: formData.user_id,
+        details:details,
+        attachment: newImageSelected ? imageData : null, 
         status: formData.status,
 
+       
       };
 
       const res = await fetch(endpoint, {
@@ -139,17 +162,20 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
   };
 
   useEffect(() => {
-    console.log(editedItem)
+    fetchCategories();
+    console.log(editedItem.user_id)
     setFormData({
       id: editedItem.id,
-      name: editedItem.name,
-      shortName: editedItem.shortName,
+      title: editedItem.title,
+      assign_id: editedItem.assign_id,
+     
+      user_id: editedItem.user_id,
       status: editedItem.status,
-    })
-  setImageData(editedItem.image)
-  setNewImageSelected(false); 
-}, [editedItem])
+})
+setDetails(editedItem.details)
+setImageData(editedItem.attachment)
 
+  }, [editedItem])
 
 
   return (
@@ -191,56 +217,66 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
             Edit Form
           </Typography>
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            <ValidatorForm className="custom-form-control" onSubmit={handleSubmit} onError={() => null}>
-              <TextField
-                fullWidth
-                type="hidden"
-                name="id"
-                label="Id"
-                size="small"
-                onChange={handleChange}
-                value={formData.id}
-                style={{ display: 'none' }}
-              />
+          <ValidatorForm onSubmit={handleSubmit} onError={() => null} data-form-identifier="add_form">
               <Grid container spacing={3}>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-
                   <TextField fullWidth
                     type="text"
-                    name="name"
-                    label="Name"
+                    name="title"
+                    label="Title"
                     size="small"
                     onChange={handleChange}
-                    value={formData.name}
+                    value={formData.title}
                     validators={["required"]}
-                    errorMessages={["This field is required"]}
+                    errorMessages={["this field is required"]}
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
+
+                <Autocomplete
+  options={merchants}
+  getOptionLabel={(merchant) => merchant.name}
+  value={merchants.find((merchant) => merchant.users_id === formData.user_id) || null}
+  onChange={(event, newValue) => {
+    handleChange({
+      target: {
+        name: 'user_id',
+        value: newValue ? newValue.users_id : '',
+      },
+    });
+  }}
+  renderInput={(params) => (
+    <TextField
+      fullWidth
+      {...params}
+      label="Merchant Name"
+      required
+      size="small"
+    />
+  )}
+/>
+                </Grid>
+                <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField fullWidth
-                    type="text"
-                    name="shortName"
-                    label="Short Name "
+                    type="number"
+                    name="assign_id"
+                    label="Assign ID"
                     size="small"
-                    value={formData.shortName}
                     onChange={handleChange}
+                    value={formData.assign_id}
                     validators={["required"]}
-                    errorMessages={["This field is required"]}
+                    errorMessages={["this field is required"]}
                   />
                 </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
-          <TextField
-              type="file"
-              name="image"
-              label="Image"
-              size="small"
-              onChange={handleFileChange}
-         
-              // validators={["required"]}
-              // errorMessages={["this field is required"]}
-            /> 
-          </Grid>
-
+                  <TextField
+                    type="file"
+                    name="attachment"
+                    label="Attachment "
+                    size="small"
+                    onChange={handleFileChange}
+                  />
+                </Grid>
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <FormControl size="small" fullWidth>
                     <InputLabel>Status</InputLabel>
@@ -249,19 +285,23 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
                       onChange={handleChange}
                       value={formData.status}
                     >
-                      <MenuItem value="Active">Active</MenuItem>
-                      <MenuItem value="Deactive">Deactive</MenuItem>
+                      <MenuItem value="Open">Open</MenuItem>
+                      <MenuItem value="Assigned">Assigned</MenuItem>
+                      <MenuItem value="Closed">Closed</MenuItem>
+                      <MenuItem value="Reopen">Reopen</MenuItem>
                     </Select>
                   </FormControl>
+                </Grid>   
+                <Grid item lg={12} md={12} sm={12} xs={12} sx={{ mt: 0 }}>
+                <Typography variant="subtitle1" style={{ fontWeight:'bold' }}>Details</Typography>
+                <ReactQuill fullWidth style={{ height:"100px"}} 
+                value={details} onChange={setDetails}  theme="snow" />
                 </Grid>
+
               </Grid>
-              <Button
-                style={{ marginTop: 30 }}
-                color="primary"
-                variant="contained"
-                type="submit"
-                size="small"
-              >
+
+              <Button  style={{ marginTop: 60 }} color="primary" variant="contained"
+                type="submit">
                 <Icon>send</Icon>
                 <Span sx={{ pl: 1, textTransform: "capitalize" }}>Submit</Span>
               </Button>
@@ -273,4 +313,4 @@ function CategoriesEdit({ handleClose, open, editedItem }) {
   );
 }
 
-export default CategoriesEdit;
+export default TicketEdit;
