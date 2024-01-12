@@ -27,20 +27,16 @@ import RefundPolicy from './components/Manageweb/RefundPolicy';
 import Cancellation from './components/Manageweb/Cancellation';
 import ContactUs from './components/Manageweb/ContactUs';
 import Faq from './components/Manageweb/Faq';
-import Transactionlist from './components/Report/Transactionlist';
-
-
-
-
-
-
-
+import Transactionlist from './components/Reports/Transactionlist';
+import ApiDoc from './components/ManageApiDoc/ApiDoc';
 import Profile from './components/user/Profile';
 import Managepassword from './components/user/Managepassword';
 import Payment_gateway from './components/PaymentGateway/Payment_gateway';
-
-
-
+import Documentation from './components/Documentation/Documentation';
+import Dasboard from '.././app/views/dashboard/Dasboard';
+import MemberProfile from './components/Member/MemberProfile';
+import Ticket from './components/ManageTicket/Ticket';
+import TicketTag from './components/ManageTicket/TicketTag';
 
 
 // session pages
@@ -94,6 +90,7 @@ const routes = [
       { path: '/Manageweb/Blog', element: <Blog /> },
       { path: '/Manageweb/Services', element: <Services /> },
       { path: '/Manageweb/About', element: <About /> },
+
       { path: '/Manageweb/TermsCondition', element: <TermsCondition /> },
       { path: '/Manageweb/PrivacyPolicies', element: <PrivacyPolicies /> },
       { path: '/Manageweb/RefundPolicy', element: <RefundPolicy /> },
@@ -102,10 +99,14 @@ const routes = [
       { path: '/Manageweb/Faq', element: <Faq /> },
 
       { path: '/Report/transaction_list', element: <Transactionlist /> },
-     
-
+      { path: '/ManageApiDoc/ApiDoc', element: <ApiDoc /> },
+      { path: '/Dasboard/Dasboard', element: <Dasboard /> },
+      { path: '/Member/MemberProfile', element: <MemberProfile /> },
 
       
+      { path: '/ManageTicket/Ticket', element: <Ticket /> },
+      { path: '/ManageTicket/TicketTag/:ticketId', element: <TicketTag /> },
+   
     ]
   },
 
@@ -114,6 +115,7 @@ const routes = [
   { path: '/session/signin', element: <JwtLogin /> },
   // { path: '/session/signup', element: <JwtRegister /> },
   { path: '/session/forgot-password', element: <ForgotPassword /> },
+  { path: '/api/api_documentation', element: <Documentation /> },
 
 
   { path: '*', element: <NotFound /> }

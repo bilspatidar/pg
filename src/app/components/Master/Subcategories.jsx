@@ -431,7 +431,7 @@ const handleFilterFormSubmit = async (e) => {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Sub Categories Form">
+          <SimpleCard title="Sub Category Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
@@ -488,7 +488,7 @@ const handleFilterFormSubmit = async (e) => {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Sub Categories Table">
+        <SimpleCard title="Sub Categories List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

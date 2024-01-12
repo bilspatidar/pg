@@ -929,7 +929,7 @@ function Merchant() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Merchant Table">
+        <SimpleCard title="Merchant List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>

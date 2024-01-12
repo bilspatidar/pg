@@ -17,13 +17,14 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: '80%',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   p: 4,
+  overflow:'scroll',
+  height: "90%"
 };
-
 function BlogCategoryEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ function BlogCategoryEdit({ handleClose, open, editedItem }) {
   const [apiResponse, setApiResponse] = useState(null);
   const [errorMsg, setErrorMsg] = useState([]);
   const [imageData, setImageData] = useState('');
-
+  const [newImageSelected, setNewImageSelected] = useState(false); 
   const [formData, setFormData] = useState({
     name: '',
     image: '',
@@ -41,11 +42,16 @@ function BlogCategoryEdit({ handleClose, open, editedItem }) {
   //   //setTableData(tableData);
   //   tableData();
   // }
-   const handleFileChange = (e) => {
-     
-        
-    handleFileInputChange(e,setImageData);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
 
+    if (file) {
+      handleFileInputChange(e, setImageData);
+      setNewImageSelected(true); // Set the flag when a new image is selected
+    } else {
+      setImageData('');
+      setNewImageSelected(false); // Reset the flag when no file is selected
+    }
   };
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,8 +71,8 @@ function BlogCategoryEdit({ handleClose, open, editedItem }) {
       const data = {
         id: formData.id,
        name: formData.name,
-       image:imageData, 
-        status: formData.status,
+       image: newImageSelected ? imageData : null, 
+       status: formData.status,
 
       };
 
@@ -134,12 +140,9 @@ function BlogCategoryEdit({ handleClose, open, editedItem }) {
       name: editedItem.name,
      
       status: editedItem.status,
-
-
-
-  
 })
 setImageData(editedItem.image)
+setNewImageSelected(false);
   }, [editedItem])
 
 

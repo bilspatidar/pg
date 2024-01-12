@@ -35,6 +35,8 @@ import {
 import CustomSnackbar from '../CustomSnackbar';
 
 import { Link } from 'react-router-dom';
+
+
 const Container = styled('div')(({ theme }) => ({
   margin: '30px',
   [theme.breakpoints.down('sm')]: { margin: '16px' },
@@ -56,6 +58,10 @@ const Small = styled('small')(({ bgcolor }) => ({
 
 
 const useStyles = makeStyles((theme) => ({
+  profilePic: {
+    width: theme.spacing(40), // Set your desired size
+    height: theme.spacing(18),
+  },
   root: {
     '& .MuiTextField-root': {
       margin: theme.spacing(1),
@@ -160,6 +166,7 @@ function Profile(handleClose, open, editedItem) {
 
   const [errorMsg, setErrorMsg] = useState([]);
   const [imageData, setImageData] = useState('');
+  const [newImageSelected, setNewImageSelected] = useState(false); 
 
   const [formData, setFormData] = useState({
     name: '',
@@ -182,12 +189,16 @@ function Profile(handleClose, open, editedItem) {
     })
   }
   const handleFileChange = (e) => {
+    const file = e.target.files[0];
 
-
-    handleFileInputChange(e, setImageData);
-
+    if (file) {
+      handleFileInputChange(e, setImageData);
+      setNewImageSelected(true); // Set the flag when a new image is selected
+    } else {
+      setImageData('');
+      setNewImageSelected(false); // Reset the flag when no file is selected
+    }
   };
- 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -205,7 +216,7 @@ function Profile(handleClose, open, editedItem) {
         company_name: formData.company_name,
         address: formData.address,
         status: formData.status,
-        profile_pic: imageData,
+        profile_pic: newImageSelected ? imageData : null, 
       };
 
       const res = await fetch(endpoint, {
@@ -292,6 +303,7 @@ function Profile(handleClose, open, editedItem) {
         mobile: data[0].mobile,
         company_name: data[0].company_name,
         address: data[0].address,
+     
         imageData: data[0].profile_pic,
         status: data[0].status,
       })
@@ -348,14 +360,14 @@ function Profile(handleClose, open, editedItem) {
             <div className="card-body no-padding height-9">
            
             <div className="row">
-  <div className="profile-userpic">
-
-      <img src={formData.profile_pic} className="img-responsive" alt="Profile Picture" />
-   
-      
-   
-  </div>
-</div>
+      <div className="profile-userpic">
+        <Avatar
+          alt="Profile Picture"
+          src={usersDetails.profile_pic}
+          className={classes.profilePic}
+        />
+      </div>
+    </div>
               <div className="profile-usertitle">
                 <div className="profile-usertitle-name">{usersDetails.name}</div>
                 <div className="profile-usertitle-job"><h3>{usersDetails.company_name}</h3></div>

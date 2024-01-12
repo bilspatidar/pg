@@ -2,8 +2,12 @@ import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlin
 import ReportIcon from '@mui/icons-material/Report';
 import LanguageIcon from '@mui/icons-material/Language';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import BookOnlineIcon from '@mui/icons-material/BookOnline';
+
 export const navigations = [
-  { name: 'Super admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+  // { name: 'Super Admin Dashboard', path: '/dashboard/default', icon: 'dashboard' },
+  { name: 'Super Admin Dashboard', path: '/Dasboard/Dasboard', icon: 'dashboard' },
   // {
   //   name: 'Session/Auth',
   //   icon: 'security',
@@ -96,24 +100,48 @@ export const navigations = [
 
       { name: 'Transaction', path: '/Report/transaction_list', iconText: 'T' },
     
+     
+    ]
+  },
+  {
+    name: 'Manage Api Doc',
+    icon: <FileOpenIcon />,
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Api Doc', path: '/ManageApiDoc/ApiDoc', iconText: 'T' },
+    
 
     ]
   },
-  // {
-  //   name: 'Manage Member',
-  //   icon: 'tag_faces',
-  //   badge: { value: '', color: 'primary' },
-  //   children: [
+  {
+    name: 'Manage Member',
+    icon: 'tag_faces',
+    badge: { value: '', color: 'primary' },
+    children: [
      
-  //     { name: 'Add Member', path: '/member/addmember', iconText: 'F' },
+      { name: ' Member Profile', path: '/Member/MemberProfile', iconText: 'F' },
     
-  //     { name: 'All Member', path: '/member/all_member', iconText: 'T' }
-  //   ]
-  // },
+      // { name: 'Testing', path: 'text/Testing', iconText: 'T' }
+    ]
+  },
+  {
+    name: 'Manage Ticket',
+    icon: <BookOnlineIcon/>,
+    badge: { value: '', color: 'primary' },
+    children: [
+     
+    
+      { name: 'Ticket', path: 'ManageTicket/Ticket', iconText: 'T' },
+    ]
+  },
   // {
   //   name: 'Documentation',
   //   icon: 'launch',
   //   type: 'extLink',
   //   path: 'http://demos.ui-lib.com/matx-react-doc/'
   // }
+ 
 ];

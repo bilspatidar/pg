@@ -138,7 +138,7 @@ function Merchantkeyslist() {
 
   const [formData, setFormData] = useState({
 
-            title: '',
+            mid: '',
             merchant_id: '',
             webhook_url: '',
            
@@ -166,13 +166,13 @@ function Merchantkeyslist() {
   }
   //Get Data from API 
   //Get Data from API 
-  async function geTableCellata(title, status,from_date,to_date,merchant_id) {
+  async function geTableCellata(mid, status,from_date,to_date,merchant_id) {
     const endpoint = `${BASE_URL}/api/user/merchant_keys_list`;
   
     try {
       const body = {};
-      if (title) {
-        body.title = title;
+      if (mid) {
+        body.mid = mid;
       }
       if (status) {
         body.status = status;
@@ -210,7 +210,7 @@ function Merchantkeyslist() {
   }
 
   const [filterFormData, setFilterFormData] = useState({
-    title: '',
+    mid: '',
     status: '',
     from_date: '', 
     to_date: '', 
@@ -226,8 +226,8 @@ function Merchantkeyslist() {
   const handleFilterFormSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { title, status, from_date, to_date,merchant_id } = filterFormData; // Destructure from_date and to_date from filterFormData
-    await geTableCellata(title, status, from_date, to_date,merchant_id);
+    const { mid, status, from_date, to_date,merchant_id } = filterFormData; // Destructure from_date and to_date from filterFormData
+    await geTableCellata(mid, status, from_date, to_date,merchant_id);
   };
 
   const handleChange = (e) => {
@@ -249,7 +249,7 @@ function Merchantkeyslist() {
     console.log(formData.merchant_id);
     try {
       const data = {
-        title: formData.title,
+        mid: formData.mid,
         merchant_id: formData.merchant_id, 
         webhook_url: formData.webhook_url,
      
@@ -274,7 +274,7 @@ function Merchantkeyslist() {
         console.log(responseData.message)
         setFormData(
           {
-            title: '',
+            mid: '',
             merchant_id: '',
             webhook_url: '',
            
@@ -469,11 +469,11 @@ function Merchantkeyslist() {
                 <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField
                     type="text"
-                    name="title"
-                    label="Title"
+                    name="mid"
+                    label="Mid"
                     size="small"
                     onChange={handleChange}
-                    value={formData.title}
+                    value={formData.mid}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />
@@ -505,18 +505,18 @@ function Merchantkeyslist() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Merchant Key Table">
+        <SimpleCard title="Merchant Key List">
         <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
               <TextField
     id="filterOne"
-    label="Tittle"
+    label="Mid"
     variant="outlined"
     size="small"
     fullWidth
-    name="title"
-    value={filterFormData.title}
+    name="mid"
+    value={filterFormData.mid}
     onChange={handleFilterFormChange}
   />
 
@@ -621,7 +621,7 @@ function Merchantkeyslist() {
 
                 <TableRow>
                   <TableCell align="left">Sr no.</TableCell>
-                  <TableCell align="center"> Title</TableCell>
+                  <TableCell align="center"> Mid</TableCell>
                   <TableCell align="center">Merchant Name</TableCell>
                   <TableCell align="center">Webhook Url</TableCell>
                   <TableCell align="center">Status</TableCell>
@@ -636,7 +636,7 @@ function Merchantkeyslist() {
                   .map((item, index) => (
                     <TableRow key={index}>
                       <TableCell align="left">{index + 1}</TableCell>
-                      <TableCell align="center">{item.title}</TableCell>
+                      <TableCell align="center">{item.mid}</TableCell>
                       <TableCell align="center">{item.merchant_id}</TableCell>
                       <TableCell align="center">{item.webhook_url}</TableCell>
                       

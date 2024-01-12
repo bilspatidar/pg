@@ -206,7 +206,7 @@ function TermsCondition({ handleClose, open, editedItem }) {
         }
 
         <Stack spacing={3}>
-          <SimpleCard title="TermsCondition Form">
+          <SimpleCard title="Terms & Condition Form">
             <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
               <Grid container spacing={3}>
               <TextField

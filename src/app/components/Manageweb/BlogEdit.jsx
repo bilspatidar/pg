@@ -19,13 +19,14 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: '80%',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   p: 4,
+  overflow:'scroll',
+  height: "90%"
 };
-
 function BlogEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +36,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
   const [imageData, setImageData] = useState('');
   const [categories, setCategories] = useState([]);
   const [description, setDescription] = useState('');
+  const [newImageSelected, setNewImageSelected] = useState(false); 
 
   const [formData, setFormData] = useState({
     title: '',
@@ -47,11 +49,23 @@ function BlogEdit({ handleClose, open, editedItem }) {
   //   //setTableData(tableData);
   //   tableData();
   // }
-   const handleFileChange = (e) => {
+  //  const handleFileChange = (e) => {
      
         
-    handleFileInputChange(e,setImageData);
+  //   handleFileInputChange(e,setImageData);
 
+  // };
+ 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      handleFileInputChange(e, setImageData);
+      setNewImageSelected(true); // Set the flag when a new image is selected
+    } else {
+      setImageData('');
+      setNewImageSelected(false); // Reset the flag when no file is selected
+    }
   };
 
   const fetchCategories = async () => {
@@ -92,7 +106,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
         title: formData.title,
         category_id: formData.category_id,
         description: description,
-        image: imageData,
+        image: newImageSelected ? imageData : null, 
         status: formData.status,
 
       };
@@ -156,7 +170,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
 
   useEffect(() => {
     fetchCategories();
-    console.log(editedItem.description)
+    // console.log(editedItem.description)
     setFormData({
       id: editedItem.id,
       title: editedItem.title,
@@ -168,6 +182,7 @@ function BlogEdit({ handleClose, open, editedItem }) {
 })
 setDescription(editedItem.description)
 setImageData(editedItem.image)
+setNewImageSelected(false); 
   }, [editedItem])
 
 
@@ -266,7 +281,6 @@ setImageData(editedItem.image)
               label="Image"
               size="small"
               onChange={handleFileChange}
-         
               // validators={["required"]}
               // errorMessages={["this field is required"]}
             /> 

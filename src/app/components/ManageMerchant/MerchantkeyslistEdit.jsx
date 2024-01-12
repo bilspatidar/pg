@@ -19,12 +19,15 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: '80%',
   bgcolor: 'background.paper',
   border: '1px solid #fff',
   boxShadow: 24,
   p: 4,
+  overflow:'scroll',
+  height: "90%"
 };
+
 
 function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   const [loading, setLoading] = useState(true);
@@ -35,7 +38,7 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
   const [merchants, setMerchants] = useState([]);
 
   const [formData, setFormData] = useState({
-    title: '',
+    mid: '',
     merchant_id: '',
     webhook_url: '',
     status: '',
@@ -82,7 +85,7 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
     try {
       const data = {
         id: formData.id,
-        title: formData.title,
+        mid: formData.mid,
         merchant_id: formData.merchant_id,
         webhook_url: formData.webhook_url,
         status: formData.status,
@@ -151,7 +154,7 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
     console.log(editedItem.description)
     setFormData({
       id: editedItem.id,
-      title: editedItem.title,
+      mid: editedItem.mid,
         merchant_id: editedItem.merchant_id,
         webhook_url: editedItem.webhook_url,
      
@@ -240,11 +243,11 @@ function MerchantkeyslistEdit({ handleClose, open, editedItem }) {
                 <Grid item lg={4} md={4} sm={12} xs={12} sx={{ mt: 1 }}>
                   <TextField fullWidth
                     type="text"
-                    name="title"
-                    label="Title"
+                    name="mid"
+                    label="Mid"
                     size="small"
                     onChange={handleChange}
-                    value={formData.title}
+                    value={formData.mid}
                     validators={["required"]}
                     errorMessages={["this field is required"]}
                   />

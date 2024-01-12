@@ -396,7 +396,7 @@ function BusinessTypes() {
 
 
         <Stack spacing={3}>
-          <SimpleCard title="Business types Form">
+          <SimpleCard title="Business type Form">
 
 
             <ValidatorForm onSubmit={handleSubmit} onError={() => null} data-form-identifier="add_form">
@@ -427,7 +427,7 @@ function BusinessTypes() {
         </Stack>
       </Container>
       <Container>
-        <SimpleCard title="Business types Table">
+        <SimpleCard title="Business type List">
           <ValidatorForm className="filterForm" onSubmit={handleFilterFormSubmit} data-form-identifier="filter_form">
             <Grid container spacing={2}>
               <Grid item xs={12} md={3}>
@@ -512,7 +512,8 @@ function BusinessTypes() {
                       <TableCell align="right">
 
 
-                        <ModeTwoToneIcon fontSize="small" style={{ color: '#173853' }}
+                        
+                      <ModeTwoToneIcon fontSize="small" style={{ color: '#173853' }}
                           onClick={() => handleOpen(item)}>
                           <Icon>edit</Icon>
                         </ModeTwoToneIcon>

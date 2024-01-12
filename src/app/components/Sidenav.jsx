@@ -13,7 +13,7 @@ const StyledScrollBar = styled(Scrollbar)(() => ({
   paddingRight: '1rem',
   position: 'relative'
 }));
-
+const isDocs = true;
 const SideNavMobile = styled('div')(({ theme }) => ({
   position: 'fixed',
   top: 0,
@@ -53,6 +53,7 @@ const Sidenav = ({ children }) => {
         {user_type === 'superadmin' && <MatxVerticalNav items={navigations} />}
         {user_type === 'merchant' && <MatxVerticalNav items={navigations2} />}
         {user_type === 'user' && <MatxVerticalNav items={navigations3} />}
+      
       </StyledScrollBar>
 
       <SideNavMobile onClick={() => updateSidebarMode({ mode: 'close' })} />
