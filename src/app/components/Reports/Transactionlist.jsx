@@ -484,8 +484,8 @@ function Transactionlist() {
                   <TableCell align="center">RequestMode</TableCell>
                   <TableCell align="center">Cardnumber </TableCell>
                   <TableCell align="center">Cardholdername</TableCell>
-                  <TableCell align="center">Expirymonth</TableCell>
-                  <TableCell align="center">Expiryyear</TableCell>
+                  <TableCell align="center">Expiry month</TableCell>
+                  <TableCell align="center">Expiry year</TableCell>
                   <TableCell align="center">Cardcvv</TableCell>
                   <TableCell align="center">CardType</TableCell>
                   <TableCell align="center">Payment Id</TableCell>

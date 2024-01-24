@@ -143,7 +143,6 @@ console.log(ticketId);
   const [formData, setFormData] = useState({
 
     title: '',
-    assign_id: '',
     attachment: '',
     ticket_id:'',
  
@@ -241,7 +240,6 @@ console.log(ticketId);
         setFormData(
           {
             title: '',
-            assign_id: '',
             attachment: '',
             ticket_id:'',
             description: '',
@@ -509,7 +507,20 @@ console.log(ticketId);
                       <TableCell align="left">{index + 1}</TableCell>
                       <TableCell align="center">{item.title}</TableCell>
                       <TableCell align="center">{item.ticket_id}</TableCell>
-                      <TableCell align="center">{item.attachment}</TableCell>
+                      <TableCell align="center">
+        {item.attachment ? (
+          <a href={item.attachment} target="_blank" rel="noopener noreferrer">
+            <img
+              style={{ height: '50px', width: '50px' }}
+              src={item.attachment}
+              alt="Item Image"
+            />
+          </a>
+        ) : (
+          <span>No Image Available</span>
+        )}
+      </TableCell>
+                     
                     
                      
                       <TableCell align="right">
