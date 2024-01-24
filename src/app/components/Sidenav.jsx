@@ -8,6 +8,7 @@ import { navigations2 } from 'app/navigations2';
 import { navigations3 } from 'app/navigations3';
 import useAuth from 'app/hooks/useAuth';
 
+
 const StyledScrollBar = styled(Scrollbar)(() => ({
   paddingLeft: '1rem',
   paddingRight: '1rem',

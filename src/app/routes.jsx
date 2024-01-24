@@ -26,6 +26,9 @@ import RefundPolicy from './components/Manageweb/RefundPolicy';
 import Cancellation from './components/Manageweb/Cancellation';
 import ContactUs from './components/Manageweb/ContactUs';
 import Faq from './components/Manageweb/Faq';
+import Ticket from './components/ManageTicket/Ticket';
+// import TicketTag from './components/ManageTicket/TicketTag';
+
 
 
 
@@ -96,6 +99,8 @@ const routes = [
       { path: '/Manageweb/Cancellation', element: <Cancellation /> },
       { path: '/Manageweb/ContactUs', element: <ContactUs /> },
       { path: '/Manageweb/Faq', element: <Faq /> },
+      { path: '/ManageTicket/Ticket', element: <Ticket /> },
+      // { path: '/ManageTicket/TicketTag', element: <TicketTag /> },
      
 
 

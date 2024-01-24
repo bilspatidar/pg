@@ -80,6 +80,21 @@ export const navigations = [
 
     ]
   },
+
+  {
+    name: 'Manage Ticket',
+    icon: 'settings',
+
+    badge: { value: '', color: 'primary' },
+    children: [
+
+
+      { name: 'Ticket', path: '/ManageTicket/Ticket', iconText: 'T' },
+      // { name: 'TicketTag', path: '/ManageTicket/TicketTag', iconText: 'T' },
+    
+
+    ]
+  },
   // {
   //   name: 'Manage Member',
   //   icon: 'tag_faces',
